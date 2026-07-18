@@ -3,10 +3,7 @@ import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { jwt } from "better-auth/plugins";
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
-const isAtlas = MONGODB_URI.includes("mongodb+srv");
-
-const client = new MongoClient(MONGODB_URI, isAtlas ? { tls: true } : {});
+const client = new MongoClient(process.env.MONGODB_URI as string);
 const db = client.db("rentivo");
 
 export const auth = betterAuth({
