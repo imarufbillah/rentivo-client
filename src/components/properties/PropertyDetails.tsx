@@ -1,0 +1,140 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { PropertyCard } from "./PropertyCard";
+import { useTrackInteraction } from "@/hooks/useInteractions";
+import { useSession } from "@/hooks/useAuth";
+import { useReviews } from "@/hooks/useReviews";
+import { Property } from "@/../../rentivo-server/src/types";
+
+interface PropertyDetailsProps {
+  property: Property;
+  relatedProperties?: Property[];
+}
+
+export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDetailsProps) => {
+  const { data: session } = useSession();
+  const trackInteraction = useTrackInteraction();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { data: reviewData } = useReviews(property._id?.toString() || "");
+
+  useEffect(() => {
+    if (session && property._id) {
+      trackInteraction.mutate({
+        propertyId: property._id.toString(),
+        type: "view",
+      });
+    }
+  }, [property._id, session]);
+
+  const handleSave = () => {
+    if (!session || !property._id) return;
+    trackInteraction.mutate({ propertyId: property._id.toString(), type: "save" });
+  };
+
+  const handleDismiss = () => {
+    if (!session || !property._id) return;
+    trackInteraction.mutate({ propertyId: property._id.toString(), type: "dismiss" });
+  };
+
+  const images = property.images.length > 0 ? property.images : ["/placeholder.jpg"];
+
+  return (
+    <div className="mx-auto max-w-6xl space-y-8">
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-4">
+          <div className="relative aspect-video w-full overflow-hidden rounded-xl">
+            <Image
+              src={images[currentImageIndex]}
+              alt={property.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 66vw"
+              priority
+            />
+          </div>
+
+          {images.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {images.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentImageIndex(i)}
+                  className={`relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-colors ${
+                    i === currentImageIndex ? "border-primary" : "border-transparent"
+                  }`}
+                >
+                  <Image src={img} alt="" fill className="object-cover" sizes="96px" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">{property.propertyType}</Badge>
+              <Badge variant="outline">{property.status}</Badge>
+            </div>
+            <h1 className="mt-3 text-2xl font-bold">{property.title}</h1>
+            <p className="mt-1 text-muted-foreground">{property.location}</p>
+          </div>
+
+          <div className="rounded-xl border p-4">
+            <div className="text-3xl font-bold text-primary">
+              ${property.price.toLocaleString()}
+              <span className="text-base font-normal text-muted-foreground">/mo</span>
+            </div>
+          </div>
+
+          {reviewData && (
+            <div className="rounded-xl border p-4">
+              <div className="flex items-center gap-2">
+                <span className="text-lg text-warning">★</span>
+                <span className="text-lg font-semibold">
+                  {reviewData.averageRating?.toFixed(1) || "N/A"}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  ({reviewData.totalReviews} reviews)
+                </span>
+              </div>
+            </div>
+          )}
+
+          {session && (
+            <div className="flex gap-3">
+              <Button onClick={handleSave} className="flex-1">
+                Save Property
+              </Button>
+              <Button onClick={handleDismiss} variant="outline" className="flex-1">
+                Dismiss
+              </Button>
+            </div>
+          )}
+
+          <div>
+            <h2 className="mb-2 font-semibold">About this property</h2>
+            <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+              {property.description}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {relatedProperties.length > 0 && (
+        <div>
+          <h2 className="mb-4 text-xl font-bold">Similar Properties</h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {relatedProperties.map((p) => (
+              <PropertyCard key={p._id?.toString()} property={p} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
