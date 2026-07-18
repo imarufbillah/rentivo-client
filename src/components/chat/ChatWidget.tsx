@@ -7,6 +7,7 @@ import { ChatToolCallIndicator } from "./ChatToolCallIndicator";
 import { ChatFollowUpSuggestions } from "./ChatFollowUpSuggestions";
 import { useSession } from "@/hooks/useAuth";
 import { isLLMServiceError } from "@/lib/api/error";
+import { authClient } from "@/lib/auth-client";
 
 interface Message {
   role: "user" | "assistant";
@@ -45,9 +46,15 @@ export const ChatWidget = () => {
     setIsStreaming(true);
 
     try {
+      const { data: tokenData } = await authClient.token();
+      const token = tokenData?.token;
+
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
       const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         credentials: "include",
         body: JSON.stringify({
           message: text,
@@ -125,9 +132,15 @@ export const ChatWidget = () => {
 
   const fetchSuggestions = async () => {
     try {
+      const { data: tokenData } = await authClient.token();
+      const token = tokenData?.token;
+
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
       const response = await fetch(`${API_BASE_URL}/api/chat/suggestions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         credentials: "include",
         body: JSON.stringify({
           conversationHistory: messages.slice(-4).map((m) => ({
