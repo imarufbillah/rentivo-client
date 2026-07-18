@@ -69,3 +69,23 @@ export const useUpgradeToOwner = () => {
     },
   });
 };
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { name?: string; image?: string }) => {
+      const result = await authClient.updateUser({
+        name: data.name,
+        image: data.image,
+      });
+      if (result.error) {
+        throw new Error(result.error.message || 'Failed to update profile');
+      }
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['session'] });
+    },
+  });
+};
