@@ -19,6 +19,7 @@ export const Navbar = () => {
   const navLinks = [
     { href: "/properties", label: "Properties" },
     ...(isAuthenticated ? [{ href: "/dashboard", label: "Dashboard" }] : []),
+    ...(isAuthenticated ? [{ href: "/saved", label: "Saved" }] : []),
     ...(isOwner ? [{ href: "/properties/manage", label: "My Properties" }] : []),
   ];
 
