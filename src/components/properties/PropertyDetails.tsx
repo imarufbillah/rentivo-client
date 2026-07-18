@@ -75,7 +75,7 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
                     i === currentImageIndex ? "border-primary" : "border-transparent"
                   }`}
                 >
-                  <Image src={img} alt={`Thumbnail ${i + 1}`} fill className="object-cover" sizes="96px" />
+                  <Image src={img} alt={`Thumbnail ${i + 1}`} fill className="object-cover" sizes="96px" loading="lazy" />
                 </button>
               ))}
             </div>

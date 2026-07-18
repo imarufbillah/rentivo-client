@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { ChatWidget } from "@/components/chat/ChatWidget";
+import { ChatWidgetWrapper } from "@/components/chat/ChatWidgetWrapper";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import "./globals.css";
 
@@ -39,7 +39,7 @@ export default function RootLayout({
             <ErrorBoundary>{children}</ErrorBoundary>
           </main>
           <Footer />
-          <ChatWidget />
+          <ChatWidgetWrapper />
         </Providers>
       </body>
     </html>
