@@ -40,21 +40,27 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
     trackInteraction.mutate({ propertyId: property._id.toString(), type: "dismiss" });
   };
 
-  const images = property.images.length > 0 ? property.images : ["/placeholder.jpg"];
+  const images = property.images;
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
           <div className="relative aspect-video w-full overflow-hidden rounded-xl">
-            <Image
-              src={images[currentImageIndex]}
-              alt={property.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 66vw"
-              priority
-            />
+            {images.length > 0 ? (
+              <Image
+                src={images[currentImageIndex]}
+                alt={property.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 66vw"
+                priority
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center bg-muted text-muted-foreground">
+                No images available
+              </div>
+            )}
           </div>
 
           {images.length > 1 && (
