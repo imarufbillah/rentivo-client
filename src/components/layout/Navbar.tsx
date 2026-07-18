@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "./ThemeToggle";
 import { useSession } from "@/hooks/useAuth";
 import { authClient } from "@/lib/auth-client";
 
@@ -50,6 +51,7 @@ export const Navbar = () => {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
+          <ThemeToggle />
           {isAuthenticated ? (
             <>
               {!isOwner && (
@@ -113,6 +115,9 @@ export const Navbar = () => {
               </Link>
             ))}
             <div className="border-t my-2" />
+            <div className="flex justify-center">
+              <ThemeToggle />
+            </div>
             {isAuthenticated ? (
               <>
                 {!isOwner && (
