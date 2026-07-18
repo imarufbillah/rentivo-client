@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
+import { signIn, signUp } from '@/lib/auth-client';
 import { User } from '@/../../rentivo-server/src/types';
 
 interface SessionResponse {
@@ -19,8 +20,17 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { email: string; password: string }) =>
-      apiClient.post<SessionResponse>('/api/auth/sign-in/email', data),
+    mutationFn: async (data: { email: string; password: string }) => {
+      const result = await signIn.email({
+        email: data.email,
+        password: data.password,
+      });
+      if (result.error) {
+        throw new Error(result.error?.message || 'Login failed');
+      }
+      const sessionData = await apiClient.get<SessionResponse>('/api/auth/session');
+      return sessionData;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
     },
@@ -31,8 +41,18 @@ export const useRegister = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { email: string; password: string; name?: string }) =>
-      apiClient.post<SessionResponse>('/api/auth/sign-up/email', data),
+    mutationFn: async (data: { email: string; password: string; name?: string }) => {
+      const result = await signUp.email({
+        email: data.email,
+        password: data.password,
+        name: data.name || "",
+      });
+      if (result.error) {
+        throw new Error(result.error?.message || 'Registration failed');
+      }
+      const sessionData = await apiClient.get<SessionResponse>('/api/auth/session');
+      return sessionData;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
     },

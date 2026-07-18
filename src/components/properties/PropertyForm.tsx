@@ -1,9 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Property } from "@/../../rentivo-server/src/types";
+
+const propertyFormSchema = z.object({
+  title: z.string().min(5, "Title must be at least 5 characters"),
+  description: z.string().min(20, "Description must be at least 20 characters"),
+  price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Price must be positive"),
+  location: z.string().min(2, "Location is required"),
+  propertyType: z.enum(["apartment", "house", "room", "studio", "villa"]),
+  status: z.enum(["active", "pending", "archived"]),
+});
+
+type PropertyFormData = z.infer<typeof propertyFormSchema>;
 
 interface PropertyFormProps {
   initialData?: Property;
@@ -15,21 +29,27 @@ const propertyTypes = ["apartment", "house", "room", "studio", "villa"] as const
 const propertyStatuses = ["active", "pending", "archived"] as const;
 
 export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormProps) => {
-  const [title, setTitle] = useState(initialData?.title || "");
-  const [description, setDescription] = useState(initialData?.description || "");
-  const [price, setPrice] = useState(initialData?.price?.toString() || "");
-  const [location, setLocation] = useState(initialData?.location || "");
-  const [propertyType, setPropertyType] = useState<Property["propertyType"]>(
-    initialData?.propertyType || "apartment"
-  );
-  const [status, setStatus] = useState<Property["status"]>(initialData?.status || "active");
-  const [imageUrls, setImageUrls] = useState<string[]>(initialData?.images || [""]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [imageUrls, setImageUrls] = useState<string[]>(initialData?.images?.length ? initialData.images : [""]);
+  const [imageError, setImageError] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<PropertyFormData>({
+    resolver: zodResolver(propertyFormSchema),
+    defaultValues: {
+      title: initialData?.title || "",
+      description: initialData?.description || "",
+      price: initialData?.price?.toString() || "",
+      location: initialData?.location || "",
+      propertyType: initialData?.propertyType || "apartment",
+      status: initialData?.status || "active",
+    },
+  });
 
   const addImageUrl = () => {
-    if (imageUrls.length < 6) {
-      setImageUrls([...imageUrls, ""]);
-    }
+    if (imageUrls.length < 6) setImageUrls([...imageUrls, ""]);
   };
 
   const removeImageUrl = (index: number) => {
@@ -42,50 +62,32 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
     setImageUrls(updated);
   };
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!title || title.length < 5) newErrors.title = "Title must be at least 5 characters";
-    if (!description || description.length < 20) newErrors.description = "Description must be at least 20 characters";
-    if (!price || Number(price) <= 0) newErrors.price = "Price must be positive";
-    if (!location || location.length < 2) newErrors.location = "Location is required";
-
+  const onFormSubmit = (data: PropertyFormData) => {
     const validUrls = imageUrls.filter((url) => url.trim());
-    if (validUrls.length === 0) newErrors.images = "At least one image URL is required";
-    if (validUrls.length > 6) newErrors.images = "Maximum 6 images allowed";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-
+    if (validUrls.length === 0) {
+      setImageError("At least one image URL is required");
+      return;
+    }
+    setImageError("");
     onSubmit({
-      title,
-      description,
-      price: Number(price),
-      location,
-      propertyType,
-      status,
-      images: imageUrls.filter((url) => url.trim()),
+      ...data,
+      price: Number(data.price),
+      images: validUrls,
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6 max-w-2xl">
       <div>
         <label htmlFor="title" className="block text-sm font-medium mb-1.5">
           Title
         </label>
         <Input
           id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          {...register("title")}
           placeholder="Cozy apartment downtown"
         />
-        {errors.title && <p className="mt-1 text-sm text-destructive">{errors.title}</p>}
+        {errors.title && <p className="mt-1 text-sm text-destructive">{errors.title.message}</p>}
       </div>
 
       <div>
@@ -94,13 +96,12 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
         </label>
         <textarea
           id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          {...register("description")}
           rows={4}
           className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           placeholder="Describe your property in detail..."
         />
-        {errors.description && <p className="mt-1 text-sm text-destructive">{errors.description}</p>}
+        {errors.description && <p className="mt-1 text-sm text-destructive">{errors.description.message}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -111,11 +112,10 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
           <Input
             id="price"
             type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            {...register("price")}
             placeholder="1500"
           />
-          {errors.price && <p className="mt-1 text-sm text-destructive">{errors.price}</p>}
+          {errors.price && <p className="mt-1 text-sm text-destructive">{errors.price.message}</p>}
         </div>
 
         <div>
@@ -124,11 +124,10 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
           </label>
           <Input
             id="location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            {...register("location")}
             placeholder="New York"
           />
-          {errors.location && <p className="mt-1 text-sm text-destructive">{errors.location}</p>}
+          {errors.location && <p className="mt-1 text-sm text-destructive">{errors.location.message}</p>}
         </div>
       </div>
 
@@ -139,8 +138,7 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
           </label>
           <select
             id="propertyType"
-            value={propertyType}
-            onChange={(e) => setPropertyType(e.target.value as Property["propertyType"])}
+            {...register("propertyType")}
             className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
             {propertyTypes.map((type) => (
@@ -157,8 +155,7 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
           </label>
           <select
             id="status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value as Property["status"])}
+            {...register("status")}
             className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
             {propertyStatuses.map((s) => (
@@ -199,7 +196,7 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
             + Add Image
           </Button>
         )}
-        {errors.images && <p className="mt-1 text-sm text-destructive">{errors.images}</p>}
+        {imageError && <p className="mt-1 text-sm text-destructive">{imageError}</p>}
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
