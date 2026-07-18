@@ -1,16 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
-import { signIn, signUp } from '@/lib/auth-client';
+import { authClient } from '@/lib/auth-client';
 import { User } from '@/../../rentivo-server/src/types';
-
-interface SessionResponse {
-  user: User;
-}
 
 export const useSession = () => {
   return useQuery({
     queryKey: ['session'],
-    queryFn: () => apiClient.get<SessionResponse>('/api/auth/session'),
+    queryFn: async () => {
+      const result = await authClient.getSession();
+      if (result.error) {
+        return null;
+      }
+      return result.data;
+    },
     staleTime: 1000 * 60 * 5,
     retry: false,
   });
@@ -21,15 +23,14 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      const result = await signIn.email({
+      const result = await authClient.signIn.email({
         email: data.email,
         password: data.password,
       });
       if (result.error) {
-        throw new Error(result.error?.message || 'Login failed');
+        throw new Error(result.error.message || 'Login failed');
       }
-      const sessionData = await apiClient.get<SessionResponse>('/api/auth/session');
-      return sessionData;
+      return result.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
@@ -42,16 +43,15 @@ export const useRegister = () => {
 
   return useMutation({
     mutationFn: async (data: { email: string; password: string; name?: string }) => {
-      const result = await signUp.email({
+      const result = await authClient.signUp.email({
         email: data.email,
         password: data.password,
         name: data.name || "",
       });
       if (result.error) {
-        throw new Error(result.error?.message || 'Registration failed');
+        throw new Error(result.error.message || 'Registration failed');
       }
-      const sessionData = await apiClient.get<SessionResponse>('/api/auth/session');
-      return sessionData;
+      return result.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });

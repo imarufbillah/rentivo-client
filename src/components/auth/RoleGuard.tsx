@@ -21,7 +21,7 @@ export const RoleGuard = ({
     );
   }
 
-  const user = session?.user;
+  const user = session?.user as Record<string, unknown> | undefined;
   if (!user || user.role !== allowedRole) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 text-center">

@@ -1,16 +1,18 @@
 import { betterAuth } from "better-auth";
+import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { jwt } from "better-auth/plugins";
-import { MongoClient } from "mongodb";
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/rentivo';
-const isAtlas = MONGODB_URI.includes('mongodb+srv');
+const MONGODB_URI = process.env.MONGODB_URI as string;
+const isAtlas = MONGODB_URI.includes("mongodb+srv");
 
 const client = new MongoClient(MONGODB_URI, isAtlas ? { tls: true } : {});
 const db = client.db("rentivo");
 
 export const auth = betterAuth({
-  database: mongodbAdapter(db),
+  database: mongodbAdapter(db, {
+    client,
+  }),
   emailAndPassword: {
     enabled: true,
   },
@@ -20,9 +22,16 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
-  plugins: [
-    jwt(),
-  ],
+  plugins: [jwt()],
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "renter",
+      },
+    },
+  },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day

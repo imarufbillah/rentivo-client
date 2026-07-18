@@ -8,6 +8,7 @@ import { useReviews, useCreateReview } from '@/hooks/useReviews';
 import { useRecommendations } from '@/hooks/useRecommendations';
 import { useSession, useUpgradeToOwner } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api';
+import { authClient } from '@/lib/auth-client';
 
 vi.mock('@/lib/api', () => ({
   apiClient: {
@@ -21,6 +22,16 @@ vi.mock('@/lib/api', () => ({
       super(message);
     }
   },
+}));
+
+vi.mock('@/lib/auth-client', () => ({
+  authClient: {
+    getSession: vi.fn(),
+    signIn: { email: vi.fn() },
+    signUp: { email: vi.fn() },
+  },
+  signIn: { email: vi.fn() },
+  signUp: { email: vi.fn() },
 }));
 
 const createWrapper = () => {
@@ -142,15 +153,15 @@ describe('useRecommendations', () => {
 
 describe('useSession', () => {
   it('fetches session', async () => {
-    const mockData = { user: { id: '1', email: 'test@test.com', role: 'renter' } };
-    vi.mocked(apiClient.get).mockResolvedValue(mockData);
+    const mockData = { session: { id: '1' }, user: { id: '1', email: 'test@test.com', role: 'renter' } };
+    vi.mocked(authClient.getSession).mockResolvedValue({ data: mockData, error: null } as any);
 
     const { result } = renderHook(() => useSession(), {
       wrapper: createWrapper(),
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(apiClient.get).toHaveBeenCalledWith('/api/auth/session');
+    expect(authClient.getSession).toHaveBeenCalled();
   });
 });
 

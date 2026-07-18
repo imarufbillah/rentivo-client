@@ -12,7 +12,7 @@ export const Navbar = () => {
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const user = session?.user;
+  const user = session?.user as Record<string, unknown> | undefined;
   const isAuthenticated = !!user;
   const isOwner = user?.role === "owner";
 
