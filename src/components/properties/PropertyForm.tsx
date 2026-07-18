@@ -77,7 +77,7 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6 max-w-2xl">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6 max-w-2xl" noValidate>
       <div>
         <label htmlFor="title" className="block text-sm font-medium mb-1.5">
           Title
@@ -86,8 +86,10 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
           id="title"
           {...register("title")}
           placeholder="Cozy apartment downtown"
+          aria-invalid={!!errors.title}
+          aria-describedby={errors.title ? "title-error" : undefined}
         />
-        {errors.title && <p className="mt-1 text-sm text-destructive">{errors.title.message}</p>}
+        {errors.title && <p id="title-error" role="alert" className="mt-1 text-sm text-destructive">{errors.title.message}</p>}
       </div>
 
       <div>
@@ -100,8 +102,10 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
           rows={4}
           className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           placeholder="Describe your property in detail..."
+          aria-invalid={!!errors.description}
+          aria-describedby={errors.description ? "description-error" : undefined}
         />
-        {errors.description && <p className="mt-1 text-sm text-destructive">{errors.description.message}</p>}
+        {errors.description && <p id="description-error" role="alert" className="mt-1 text-sm text-destructive">{errors.description.message}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -114,8 +118,10 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
             type="number"
             {...register("price")}
             placeholder="1500"
+            aria-invalid={!!errors.price}
+            aria-describedby={errors.price ? "price-error" : undefined}
           />
-          {errors.price && <p className="mt-1 text-sm text-destructive">{errors.price.message}</p>}
+          {errors.price && <p id="price-error" role="alert" className="mt-1 text-sm text-destructive">{errors.price.message}</p>}
         </div>
 
         <div>
@@ -126,8 +132,10 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
             id="location"
             {...register("location")}
             placeholder="New York"
+            aria-invalid={!!errors.location}
+            aria-describedby={errors.location ? "location-error" : undefined}
           />
-          {errors.location && <p className="mt-1 text-sm text-destructive">{errors.location.message}</p>}
+          {errors.location && <p id="location-error" role="alert" className="mt-1 text-sm text-destructive">{errors.location.message}</p>}
         </div>
       </div>
 
@@ -176,6 +184,7 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
                 value={url}
                 onChange={(e) => updateImageUrl(i, e.target.value)}
                 placeholder="https://example.com/image.jpg"
+                aria-label={`Image URL ${i + 1}`}
               />
               {imageUrls.length > 1 && (
                 <Button
@@ -183,7 +192,8 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
                   variant="ghost"
                   size="icon"
                   onClick={() => removeImageUrl(i)}
-                  className="shrink-0"
+                  aria-label={`Remove image ${i + 1}`}
+                  className="shrink-0 min-h-[44px] min-w-[44px]"
                 >
                   ×
                 </Button>

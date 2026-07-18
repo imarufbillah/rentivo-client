@@ -34,7 +34,7 @@ export const Navbar = () => {
           Rentivo
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -80,9 +80,11 @@ export const Navbar = () => {
         </div>
 
         <button
-          className="md:hidden p-2"
+          className="md:hidden p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-menu"
         >
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {mobileMenuOpen ? (
@@ -95,8 +97,8 @@ export const Navbar = () => {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden border-t bg-background px-4 py-3">
-          <nav className="flex flex-col gap-2">
+        <div id="mobile-menu" className="md:hidden border-t bg-background px-4 py-3">
+          <nav className="flex flex-col gap-2" aria-label="Mobile navigation">
             {navLinks.map((link) => (
               <Link
                 key={link.href}

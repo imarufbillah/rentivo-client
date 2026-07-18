@@ -68,7 +68,7 @@ export const RegisterForm = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+          <div role="alert" className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
             {error}
           </div>
         )}

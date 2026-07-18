@@ -69,11 +69,13 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
                 <button
                   key={i}
                   onClick={() => setCurrentImageIndex(i)}
+                  aria-label={`View image ${i + 1}`}
+                  aria-pressed={i === currentImageIndex}
                   className={`relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-colors ${
                     i === currentImageIndex ? "border-primary" : "border-transparent"
                   }`}
                 >
-                  <Image src={img} alt="" fill className="object-cover" sizes="96px" />
+                  <Image src={img} alt={`Thumbnail ${i + 1}`} fill className="object-cover" sizes="96px" />
                 </button>
               ))}
             </div>

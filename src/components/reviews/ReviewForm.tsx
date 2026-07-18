@@ -54,20 +54,20 @@ export const ReviewForm = ({ propertyId, onSuccess }: ReviewFormProps) => {
       <h3 className="font-semibold">Write a Review</h3>
 
       {error && (
-        <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+        <div role="alert" className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="rounded-lg bg-success/10 p-3 text-sm text-success">
+        <div role="status" className="rounded-lg bg-success/10 p-3 text-sm text-success">
           Review submitted successfully!
         </div>
       )}
 
       <div>
         <label className="block text-sm font-medium mb-2">Rating</label>
-        <div className="flex gap-1">
+        <div className="flex gap-1" role="radiogroup" aria-label="Rating">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
               key={star}
@@ -75,8 +75,11 @@ export const ReviewForm = ({ propertyId, onSuccess }: ReviewFormProps) => {
               onClick={() => setRating(star)}
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
-              className="text-2xl transition-colors"
+              className="text-2xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label={`Rate ${star} stars`}
+              aria-pressed={star <= rating}
+              role="radio"
+              aria-checked={star === rating}
             >
               <span
                 className={
@@ -84,6 +87,7 @@ export const ReviewForm = ({ propertyId, onSuccess }: ReviewFormProps) => {
                     ? "text-warning"
                     : "text-muted-foreground/30"
                 }
+                aria-hidden="true"
               >
                 ★
               </span>
