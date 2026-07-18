@@ -58,3 +58,17 @@ export const useMyProperties = () => {
     queryFn: () => apiClient.get<{ properties: Property[] }>('/api/properties/my-properties'),
   });
 };
+
+export const useRelatedProperties = (location: string, propertyType: string, excludeId: string) => {
+  return useQuery({
+    queryKey: ['properties', 'related', location, propertyType, excludeId],
+    queryFn: async () => {
+      const result = await apiClient.get<PaginatedResult<Property>>('/api/properties', {
+        location,
+        limit: 4,
+      });
+      return result.data.filter((p) => p._id?.toString() !== excludeId);
+    },
+    enabled: !!location && !!propertyType && !!excludeId,
+  });
+};

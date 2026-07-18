@@ -3,12 +3,19 @@
 import { use } from "react";
 import { useRouter } from "next/navigation";
 import { PropertyDetails } from "@/components/properties/PropertyDetails";
-import { useProperty } from "@/hooks/useProperties";
+import { useProperty, useRelatedProperties } from "@/hooks/useProperties";
 
 const PropertyDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = use(params);
   const router = useRouter();
   const { data, isLoading, error } = useProperty(id);
+  const property = data?.property;
+
+  const { data: relatedData } = useRelatedProperties(
+    property?.location || "",
+    property?.propertyType || "",
+    id
+  );
 
   if (isLoading) {
     return (
@@ -22,7 +29,7 @@ const PropertyDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
     );
   }
 
-  if (error || !data?.property) {
+  if (error || !property) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
         <h2 className="text-xl font-semibold">Property not found</h2>
@@ -39,9 +46,14 @@ const PropertyDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
     );
   }
 
+  const relatedProperties = (relatedData || []).map((p) => ({
+    ...p,
+    _id: p._id?.toString(),
+  }));
+
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-8">
-      <PropertyDetails property={data.property} />
+      <PropertyDetails property={property} relatedProperties={relatedProperties as any} />
     </div>
   );
 };

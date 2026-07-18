@@ -41,6 +41,25 @@ export const LoginForm = () => {
     );
   };
 
+  const handleDemoLogin = () => {
+    setEmail("renter@demo.com");
+    setPassword("demo1234");
+    setError("");
+
+    loginMutation.mutate(
+      { email: "renter@demo.com", password: "demo1234" },
+      {
+        onSuccess: () => {
+          router.push(redirectTo);
+          router.refresh();
+        },
+        onError: (err) => {
+          setError(err.message || "Demo login failed. Please try again.");
+        },
+      }
+    );
+  };
+
   const handleGoogleLogin = async () => {
     await authClient.signIn.social({
       provider: "google",
@@ -112,6 +131,16 @@ export const LoginForm = () => {
           disabled={loginMutation.isPending}
         >
           {loginMutation.isPending ? "Signing in..." : "Sign in"}
+        </Button>
+
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full"
+          onClick={handleDemoLogin}
+          disabled={loginMutation.isPending}
+        >
+          Demo Login
         </Button>
       </form>
 

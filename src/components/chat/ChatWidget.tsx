@@ -192,6 +192,18 @@ export const ChatWidget = () => {
                 />
               ))}
 
+              {isStreaming && !activeTool && (messages.length === 0 || messages[messages.length - 1]?.role === "user") && (
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] rounded-2xl rounded-bl-md bg-muted px-4 py-2.5 text-sm">
+                    <span className="inline-flex gap-1">
+                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:0ms]" />
+                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:150ms]" />
+                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:300ms]" />
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {activeTool && <ChatToolCallIndicator toolName={activeTool} />}
 
               <div ref={messagesEndRef} />
