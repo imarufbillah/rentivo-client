@@ -65,6 +65,7 @@ describe('useCreateProperty', () => {
       location: 'New York',
       propertyType: 'apartment',
       images: ['https://example.com/img.jpg'],
+      status: 'active',
     });
 
     expect(apiClient.post).toHaveBeenCalled();
