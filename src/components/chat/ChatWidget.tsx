@@ -6,6 +6,7 @@ import { ChatMessage } from "./ChatMessage";
 import { ChatToolCallIndicator } from "./ChatToolCallIndicator";
 import { ChatFollowUpSuggestions } from "./ChatFollowUpSuggestions";
 import { useSession } from "@/hooks/useAuth";
+import { isLLMServiceError } from "@/lib/api/error";
 
 interface Message {
   role: "user" | "assistant";
@@ -108,10 +109,13 @@ export const ChatWidget = () => {
       }
 
       fetchSuggestions();
-    } catch {
+    } catch (err) {
+      const message = isLLMServiceError(err)
+        ? "The AI assistant is temporarily unavailable. Please try again later."
+        : "Sorry, something went wrong. Please try again.";
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, something went wrong. Please try again.", timestamp: new Date() },
+        { role: "assistant", content: message, timestamp: new Date() },
       ]);
     } finally {
       setIsStreaming(false);

@@ -3,7 +3,9 @@
 import { useState, useCallback } from "react";
 import { PropertyGrid } from "@/components/properties/PropertyGrid";
 import { PropertyFilters, FilterState } from "@/components/properties/PropertyFilters";
+import { Button } from "@/components/ui/button";
 import { useProperties } from "@/hooks/useProperties";
+import { getErrorMessage } from "@/lib/api/error";
 
 const PropertiesPage = () => {
   const [page, setPage] = useState(1);
@@ -17,7 +19,7 @@ const PropertiesPage = () => {
     sortOrder: "desc",
   });
 
-  const { data, isLoading } = useProperties({
+  const { data, isLoading, error, refetch } = useProperties({
     search: filters.search || undefined,
     location: filters.location || undefined,
     minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
@@ -57,7 +59,20 @@ const PropertiesPage = () => {
         </aside>
 
         <section>
-          <PropertyGrid properties={properties} isLoading={isLoading} />
+          {error ? (
+            <div className="flex flex-col items-center justify-center rounded-xl border border-destructive/20 bg-destructive/5 py-12 text-center">
+              <div className="mb-4 text-4xl">⚠️</div>
+              <h3 className="text-lg font-semibold">Failed to Load Properties</h3>
+              <p className="mt-1 max-w-md text-sm text-muted-foreground">
+                {getErrorMessage(error)}
+              </p>
+              <Button onClick={() => refetch()} variant="outline" className="mt-4">
+                Try Again
+              </Button>
+            </div>
+          ) : (
+            <PropertyGrid properties={properties} isLoading={isLoading} />
+          )}
 
           {totalPages > 1 && (
             <div className="mt-6 flex items-center justify-center gap-2">

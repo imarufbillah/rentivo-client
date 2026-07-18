@@ -4,7 +4,9 @@ import { useState } from "react";
 import { RecommendationCard } from "./RecommendationCard";
 import { PropertyFilters, FilterState } from "@/components/properties/PropertyFilters";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { useRecommendations } from "@/hooks/useRecommendations";
+import { getErrorMessage, isLLMServiceError } from "@/lib/api/error";
 
 export const RecommendationFeed = () => {
   const [filters, setFilters] = useState<FilterState>({
@@ -17,7 +19,7 @@ export const RecommendationFeed = () => {
     sortOrder: "desc",
   });
 
-  const { data, isLoading } = useRecommendations({
+  const { data, isLoading, error, refetch } = useRecommendations({
     location: filters.location || undefined,
     minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
     maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
@@ -54,6 +56,25 @@ export const RecommendationFeed = () => {
               </div>
             </div>
           ))}
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center rounded-xl border border-destructive/20 bg-destructive/5 py-12 text-center">
+          <div className="mb-4 text-4xl">
+            {isLLMServiceError(error) ? "🤖" : "⚠️"}
+          </div>
+          <h3 className="text-lg font-semibold">
+            {isLLMServiceError(error)
+              ? "AI Recommendations Unavailable"
+              : "Failed to Load Recommendations"}
+          </h3>
+          <p className="mt-1 max-w-md text-sm text-muted-foreground">
+            {isLLMServiceError(error)
+              ? "The AI recommendation service is temporarily down. Showing popular properties instead."
+              : getErrorMessage(error)}
+          </p>
+          <Button onClick={() => refetch()} variant="outline" className="mt-4">
+            Try Again
+          </Button>
         </div>
       ) : recommendations.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border py-12 text-center">
