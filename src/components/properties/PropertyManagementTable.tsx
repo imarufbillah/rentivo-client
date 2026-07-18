@@ -89,6 +89,9 @@ export const PropertyManagementTable = () => {
             <Link href={`/properties/${property._id}`}>
               <Button variant="outline" size="sm">View</Button>
             </Link>
+            <Link href={`/properties/${property._id}/edit`}>
+              <Button variant="outline" size="sm">Edit</Button>
+            </Link>
             {deletingId === property._id?.toString() ? (
               <div className="flex gap-1">
                 <Button
