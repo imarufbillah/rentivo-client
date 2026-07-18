@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
 import { useUpgradeToOwner } from "@/hooks/useAuth";
 
 const UpgradePage = () => {
-  const router = useRouter();
   const upgradeMutation = useUpgradeToOwner();
   const [error, setError] = useState("");
 
@@ -16,7 +15,7 @@ const UpgradePage = () => {
     setError("");
     upgradeMutation.mutate(undefined, {
       onSuccess: () => {
-        router.push("/properties/add");
+        toast.success("Welcome! You are now an owner. Please sign in again.");
       },
       onError: (err) => {
         setError(err.message || "Upgrade failed. Please try again.");
