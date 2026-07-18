@@ -41,6 +41,18 @@ export const useCreateProperty = () => {
   });
 };
 
+export const useUpdateProperty = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Property, '_id' | 'ownerId' | 'createdAt' | 'updatedAt'>> }) =>
+      apiClient.patch<{ property: Property }>(`/api/properties/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
+    },
+  });
+};
+
 export const useDeleteProperty = () => {
   const queryClient = useQueryClient();
 
