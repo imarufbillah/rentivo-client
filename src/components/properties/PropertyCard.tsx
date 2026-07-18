@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { useTrackInteraction } from "@/hooks/useInteractions";
 import { useSession } from "@/hooks/useAuth";
@@ -25,17 +27,40 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
   const { data: session } = useSession();
   const trackInteraction = useTrackInteraction();
   const propertyId = property._id?.toString() || "";
+  const [interactionState, setInteractionState] = useState<"idle" | "saved" | "dismissed">("idle");
 
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!session) return;
-    trackInteraction.mutate({ propertyId, type: "save" });
+    trackInteraction.mutate(
+      { propertyId, type: "save" },
+      {
+        onSuccess: () => {
+          setInteractionState("saved");
+          toast.success("Property saved");
+        },
+        onError: () => {
+          toast.error("Failed to save property");
+        },
+      }
+    );
   };
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!session) return;
-    trackInteraction.mutate({ propertyId, type: "dismiss" });
+    trackInteraction.mutate(
+      { propertyId, type: "dismiss" },
+      {
+        onSuccess: () => {
+          setInteractionState("dismissed");
+          toast.success("Property dismissed");
+        },
+        onError: () => {
+          toast.error("Failed to dismiss property");
+        },
+      }
+    );
   };
 
   return (
@@ -91,17 +116,27 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
         <div className="flex gap-2 px-4 pb-4">
           <button
             onClick={handleSave}
+            disabled={trackInteraction.isPending || interactionState === "saved"}
             aria-label={`Save ${property.title}`}
-            className="rounded-lg bg-primary/10 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
+            className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
+              interactionState === "saved"
+                ? "bg-green-100 text-green-700"
+                : "bg-primary/10 text-primary hover:bg-primary/20"
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            Save
+            {interactionState === "saved" ? "Saved ✓" : "Save"}
           </button>
           <button
             onClick={handleDismiss}
+            disabled={trackInteraction.isPending || interactionState === "dismissed"}
             aria-label={`Dismiss ${property.title}`}
-            className="rounded-lg bg-muted px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-muted/80 transition-colors"
+            className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
+              interactionState === "dismissed"
+                ? "bg-muted text-muted-foreground/70"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            Dismiss
+            {interactionState === "dismissed" ? "Dismissed" : "Dismiss"}
           </button>
         </div>
       )}

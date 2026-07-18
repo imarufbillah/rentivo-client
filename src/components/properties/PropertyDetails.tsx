@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PropertyCard } from "./PropertyCard";
@@ -20,6 +21,7 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
   const trackInteraction = useTrackInteraction();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { data: reviewData } = useReviews(property._id?.toString() || "");
+  const [interactionState, setInteractionState] = useState<"idle" | "saved" | "dismissed">("idle");
 
   useEffect(() => {
     if (session && property._id) {
@@ -32,12 +34,34 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
 
   const handleSave = () => {
     if (!session || !property._id) return;
-    trackInteraction.mutate({ propertyId: property._id.toString(), type: "save" });
+    trackInteraction.mutate(
+      { propertyId: property._id.toString(), type: "save" },
+      {
+        onSuccess: () => {
+          setInteractionState("saved");
+          toast.success("Property saved to your favorites");
+        },
+        onError: () => {
+          toast.error("Failed to save property. Please try again.");
+        },
+      }
+    );
   };
 
   const handleDismiss = () => {
     if (!session || !property._id) return;
-    trackInteraction.mutate({ propertyId: property._id.toString(), type: "dismiss" });
+    trackInteraction.mutate(
+      { propertyId: property._id.toString(), type: "dismiss" },
+      {
+        onSuccess: () => {
+          setInteractionState("dismissed");
+          toast.success("Property dismissed");
+        },
+        onError: () => {
+          toast.error("Failed to dismiss property. Please try again.");
+        },
+      }
+    );
   };
 
   const images = property.images;
@@ -115,11 +139,20 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
 
           {session && (
             <div className="flex gap-3">
-              <Button onClick={handleSave} className="flex-1">
-                Save Property
+              <Button
+                onClick={handleSave}
+                className="flex-1"
+                disabled={trackInteraction.isPending || interactionState === "saved"}
+              >
+                {interactionState === "saved" ? "Saved ✓" : "Save Property"}
               </Button>
-              <Button onClick={handleDismiss} variant="outline" className="flex-1">
-                Dismiss
+              <Button
+                onClick={handleDismiss}
+                variant="outline"
+                className="flex-1"
+                disabled={trackInteraction.isPending || interactionState === "dismissed"}
+              >
+                {interactionState === "dismissed" ? "Dismissed" : "Dismiss"}
               </Button>
             </div>
           )}
