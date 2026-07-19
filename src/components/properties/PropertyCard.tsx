@@ -65,7 +65,7 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
     <motion.div
       whileHover={{ scale: 1.02, y: -4 }}
       transition={{ duration: 0.2 }}
-      className="h-[400px] w-full overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-md"
+      className="w-full rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-md"
     >
       <Link href={`/properties/${propertyId}`} className="block h-full">
         <div className="relative h-48 w-full overflow-hidden">
