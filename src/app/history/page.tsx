@@ -104,7 +104,7 @@ const InteractionHistoryPage = () => {
         ) : interactions.length > 0 ? (
           <>
             <div className="space-y-3">
-              {interactions.map((interaction) => {
+              {interactions.filter((i) => typeIcons[i.type]).map((interaction) => {
                 const Icon = typeIcons[interaction.type];
                 return (
                   <div
