@@ -15,6 +15,7 @@ import { RentButton } from "./RentButton";
 import { ReviewList } from "@/components/reviews/ReviewList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { useTrackInteraction, useInteractionState } from "@/hooks/useInteractions";
+import { usePropertyRentalStatus } from "@/hooks/useRentals";
 import { useSession } from "@/hooks/useAuth";
 import { Property } from "@/../../rentivo-server/src/types";
 import { PropertyOwner } from "@/hooks/useProperties";
@@ -35,6 +36,9 @@ export const PropertyDetails = ({ property, owner, relatedProperties = [] }: Pro
   const viewTrackedRef = useRef(false);
 
   const isOwner = !!session && !!owner && session.user.id === owner._id?.toString();
+  const { data: rentalStatusData } = usePropertyRentalStatus(propertyId);
+  const hasActiveRental = rentalStatusData?.isRented && rentalStatusData?.rental?.status === "active";
+  const canReview = session && !isOwner && hasActiveRental;
 
   useEffect(() => {
     if (interactionStateData) {
@@ -163,7 +167,7 @@ export const PropertyDetails = ({ property, owner, relatedProperties = [] }: Pro
           <ReviewList propertyId={propertyId} />
         </div>
 
-        {session && (
+        {canReview && (
           <ReviewForm propertyId={propertyId} />
         )}
       </div>
