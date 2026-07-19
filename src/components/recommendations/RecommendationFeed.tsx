@@ -15,6 +15,12 @@ export const RecommendationFeed = () => {
     minPrice: "",
     maxPrice: "",
     propertyType: "",
+    minBedrooms: "",
+    maxBedrooms: "",
+    minBathrooms: "",
+    maxBathrooms: "",
+    amenities: "",
+    minRating: "",
     sortBy: "createdAt",
     sortOrder: "desc",
   });

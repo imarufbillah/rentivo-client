@@ -1,23 +1,54 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PropertyGrid } from "@/components/properties/PropertyGrid";
 import { PropertyFilters, FilterState } from "@/components/properties/PropertyFilters";
 import { Button } from "@/components/ui/button";
 import { useProperties } from "@/hooks/useProperties";
 import { getErrorMessage } from "@/lib/api/error";
 
+const defaultFilters: FilterState = {
+  search: "",
+  location: "",
+  minPrice: "",
+  maxPrice: "",
+  propertyType: "",
+  minBedrooms: "",
+  maxBedrooms: "",
+  minBathrooms: "",
+  maxBathrooms: "",
+  amenities: "",
+  minRating: "",
+  sortBy: "createdAt",
+  sortOrder: "desc",
+};
+
+const parseSearchParams = (searchParams: URLSearchParams): FilterState => ({
+  search: searchParams.get("search") || "",
+  location: searchParams.get("location") || "",
+  minPrice: searchParams.get("minPrice") || "",
+  maxPrice: searchParams.get("maxPrice") || "",
+  propertyType: searchParams.get("propertyType") || "",
+  minBedrooms: searchParams.get("minBedrooms") || "",
+  maxBedrooms: searchParams.get("maxBedrooms") || "",
+  minBathrooms: searchParams.get("minBathrooms") || "",
+  maxBathrooms: searchParams.get("maxBathrooms") || "",
+  amenities: searchParams.get("amenities") || "",
+  minRating: searchParams.get("minRating") || "",
+  sortBy: searchParams.get("sortBy") || "createdAt",
+  sortOrder: searchParams.get("sortOrder") || "desc",
+});
+
 const PropertiesPage = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState<FilterState>({
-    search: "",
-    location: "",
-    minPrice: "",
-    maxPrice: "",
-    propertyType: "",
-    sortBy: "createdAt",
-    sortOrder: "desc",
-  });
+  const [filters, setFilters] = useState<FilterState>(() => parseSearchParams(searchParams));
+
+  useEffect(() => {
+    setFilters(parseSearchParams(searchParams));
+  }, [searchParams]);
 
   const { data, isLoading, error, refetch } = useProperties({
     search: filters.search || undefined,
@@ -25,6 +56,12 @@ const PropertiesPage = () => {
     minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
     maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
     propertyType: filters.propertyType || undefined,
+    minBedrooms: filters.minBedrooms ? Number(filters.minBedrooms) : undefined,
+    maxBedrooms: filters.maxBedrooms ? Number(filters.maxBedrooms) : undefined,
+    minBathrooms: filters.minBathrooms ? Number(filters.minBathrooms) : undefined,
+    maxBathrooms: filters.maxBathrooms ? Number(filters.maxBathrooms) : undefined,
+    amenities: filters.amenities || undefined,
+    minRating: filters.minRating ? Number(filters.minRating) : undefined,
     sortBy: filters.sortBy,
     sortOrder: filters.sortOrder,
     page,
@@ -42,7 +79,32 @@ const PropertiesPage = () => {
   const handleFilterChange = useCallback((newFilters: FilterState) => {
     setFilters(newFilters);
     setPage(1);
-  }, []);
+
+    const params = new URLSearchParams();
+    if (newFilters.search) params.set("search", newFilters.search);
+    if (newFilters.location) params.set("location", newFilters.location);
+    if (newFilters.minPrice) params.set("minPrice", newFilters.minPrice);
+    if (newFilters.maxPrice) params.set("maxPrice", newFilters.maxPrice);
+    if (newFilters.propertyType) params.set("propertyType", newFilters.propertyType);
+    if (newFilters.minBedrooms) params.set("minBedrooms", newFilters.minBedrooms);
+    if (newFilters.maxBedrooms) params.set("maxBedrooms", newFilters.maxBedrooms);
+    if (newFilters.minBathrooms) params.set("minBathrooms", newFilters.minBathrooms);
+    if (newFilters.maxBathrooms) params.set("maxBathrooms", newFilters.maxBathrooms);
+    if (newFilters.amenities) params.set("amenities", newFilters.amenities);
+    if (newFilters.minRating) params.set("minRating", newFilters.minRating);
+    if (newFilters.sortBy && newFilters.sortBy !== "createdAt") params.set("sortBy", newFilters.sortBy);
+    if (newFilters.sortOrder && newFilters.sortOrder !== "desc") params.set("sortOrder", newFilters.sortOrder);
+
+    const qs = params.toString();
+    router.push(`/properties${qs ? `?${qs}` : ""}`, { scroll: false });
+  }, [router]);
+
+  const handlePageChange = useCallback((newPage: number) => {
+    setPage(newPage);
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(newPage));
+    router.push(`/properties?${params.toString()}`, { scroll: false });
+  }, [router, searchParams]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -55,7 +117,7 @@ const PropertiesPage = () => {
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <aside>
-          <PropertyFilters onFilterChange={handleFilterChange} />
+          <PropertyFilters onFilterChange={handleFilterChange} initialFilters={filters} />
         </aside>
 
         <section>
@@ -77,7 +139,7 @@ const PropertiesPage = () => {
           {totalPages > 1 && (
             <div className="mt-6 flex items-center justify-center gap-2">
               <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => handlePageChange(Math.max(1, page - 1))}
                 disabled={page <= 1}
                 className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -98,7 +160,7 @@ const PropertiesPage = () => {
                 return (
                   <button
                     key={pageNum}
-                    onClick={() => setPage(pageNum)}
+                    onClick={() => handlePageChange(pageNum)}
                     className={`h-9 w-9 rounded-lg text-sm font-medium transition-colors ${
                       page === pageNum
                         ? "bg-primary text-primary-foreground"
@@ -111,7 +173,7 @@ const PropertiesPage = () => {
               })}
 
               <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
                 disabled={page >= totalPages}
                 className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
               >

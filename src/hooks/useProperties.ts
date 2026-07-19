@@ -8,6 +8,12 @@ interface PropertyFiltersParams {
   minPrice?: number;
   maxPrice?: number;
   propertyType?: string;
+  minBedrooms?: number;
+  maxBedrooms?: number;
+  minBathrooms?: number;
+  maxBathrooms?: number;
+  amenities?: string;
+  minRating?: number;
   sortBy?: string;
   sortOrder?: string;
   page?: number;
