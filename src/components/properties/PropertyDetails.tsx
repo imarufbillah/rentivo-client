@@ -3,13 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PropertyCard } from "./PropertyCard";
+import { ListingMeta } from "./ListingMeta";
+import { PropertyInfoGrid } from "./PropertyInfoGrid";
+import { PricingSection } from "./PricingSection";
+import { PolicySection } from "./PolicySection";
+import { RulesSection } from "./RulesSection";
 import { useTrackInteraction, useInteractionState } from "@/hooks/useInteractions";
 import { useSession } from "@/hooks/useAuth";
 import { useReviews } from "@/hooks/useReviews";
 import { Property } from "@/../../rentivo-server/src/types";
+import { Star } from "lucide-react";
 
 interface PropertyDetailsProps {
   property: Property;
@@ -28,11 +33,7 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
 
   useEffect(() => {
     if (interactionStateData) {
-      if (interactionStateData.hasSaved) {
-        setInteractionState("saved");
-      } else {
-        setInteractionState("idle");
-      }
+      setInteractionState(interactionStateData.hasSaved ? "saved" : "idle");
     }
   }, [interactionStateData]);
 
@@ -105,14 +106,7 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
         </div>
 
         <div className="space-y-6">
-          <div>
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary">{property.propertyType}</Badge>
-              <Badge variant="outline">{property.status}</Badge>
-            </div>
-            <h1 className="mt-3 text-2xl font-bold">{property.title}</h1>
-            <p className="mt-1 text-muted-foreground">{property.location}</p>
-          </div>
+          <ListingMeta property={property} />
 
           <div className="rounded-xl border p-4">
             <div className="text-3xl font-bold text-primary">
@@ -124,7 +118,7 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
           {reviewData && (
             <div className="rounded-xl border p-4">
               <div className="flex items-center gap-2">
-                <span className="text-lg text-warning">★</span>
+                <Star className="h-5 w-5 fill-warning text-warning" />
                 <span className="text-lg font-semibold">
                   {reviewData.averageRating?.toFixed(1) || "N/A"}
                 </span>
@@ -136,49 +130,36 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
           )}
 
           {session && (
-            <div className="flex gap-3">
-              <Button
-                onClick={handleSave}
-                className="flex-1"
-                disabled={trackInteraction.isPending || interactionState === "saved"}
-              >
-                {interactionState === "saved" ? "Saved ✓" : "Save Property"}
-              </Button>
-            </div>
+            <Button
+              onClick={handleSave}
+              className="w-full"
+              disabled={trackInteraction.isPending || interactionState === "saved"}
+            >
+              {interactionState === "saved" ? "Saved ✓" : "Save Property"}
+            </Button>
           )}
 
-          <div>
-            <h2 className="mb-2 font-semibold">About this property</h2>
-            <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
-              {property.description}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            {property.bedrooms != null && (
-              <div>
-                <span className="font-medium">Bedrooms</span>
-                <p className="text-muted-foreground">{property.bedrooms === 0 ? "Studio" : property.bedrooms}</p>
-              </div>
-            )}
-            {property.bathrooms != null && (
-              <div>
-                <span className="font-medium">Bathrooms</span>
-                <p className="text-muted-foreground">{property.bathrooms}</p>
-              </div>
-            )}
-          </div>
+          <PropertyInfoGrid property={property} />
 
           {property.amenities && property.amenities.length > 0 && (
-            <div>
-              <h2 className="mb-2 font-semibold">Amenities</h2>
+            <div className="rounded-xl border p-4">
+              <h3 className="mb-3 font-semibold">Amenities</h3>
               <div className="flex flex-wrap gap-2">
                 {property.amenities.map((amenity) => (
-                  <Badge key={amenity} variant="secondary" className="capitalize">{amenity}</Badge>
+                  <span
+                    key={amenity}
+                    className="rounded-full bg-secondary px-3 py-1 text-xs capitalize"
+                  >
+                    {amenity}
+                  </span>
                 ))}
               </div>
             </div>
           )}
+
+          <PricingSection property={property} />
+          <PolicySection property={property} />
+          <RulesSection property={property} />
         </div>
       </div>
 

@@ -3,6 +3,7 @@
 import { use } from "react";
 import { useRouter } from "next/navigation";
 import { PropertyDetails } from "@/components/properties/PropertyDetails";
+import { PropertyDetailSkeleton } from "@/components/properties/PropertyDetailSkeleton";
 import { useProperty, useRelatedProperties } from "@/hooks/useProperties";
 
 const PropertyDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
@@ -19,12 +20,8 @@ const PropertyDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="space-y-4">
-          <div className="h-[400px] animate-pulse rounded-xl bg-muted" />
-          <div className="h-8 w-1/2 animate-pulse rounded bg-muted" />
-          <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
-        </div>
+      <div className="px-4 py-8 sm:px-6 lg:px-8">
+        <PropertyDetailSkeleton />
       </div>
     );
   }
