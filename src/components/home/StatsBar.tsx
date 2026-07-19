@@ -12,20 +12,28 @@ const stats = [
 
 export const StatsBar = () => {
   return (
-    <section className="border-y bg-muted/30 py-12">
+    <section className="border-y bg-muted/30 py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
-              className="flex flex-col items-center gap-2 text-center"
-              initial={{ opacity: 0, y: 20 }}
+              className="flex flex-col items-center gap-3 text-center"
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{
+                duration: 0.5,
+                delay: i * 0.08,
+                ease: [0.22, 1, 0.36, 1],
+              }}
             >
-              <stat.icon className="h-8 w-8 text-primary" />
-              <span className="text-3xl font-bold">{stat.value}</span>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <stat.icon className="h-6 w-6" />
+              </div>
+              <span className="font-display text-3xl font-bold tracking-tight">
+                {stat.value}
+              </span>
               <span className="text-sm text-muted-foreground">{stat.label}</span>
             </motion.div>
           ))}
