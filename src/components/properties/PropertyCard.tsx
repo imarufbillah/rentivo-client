@@ -1,13 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { useTrackInteraction, useInteractionState } from "@/hooks/useInteractions";
-import { useSession } from "@/hooks/useAuth";
 
 interface PropertyCardProps {
   property: {
@@ -28,38 +24,7 @@ interface PropertyCardProps {
 }
 
 export const PropertyCard = ({ property }: PropertyCardProps) => {
-  const { data: session } = useSession();
-  const trackInteraction = useTrackInteraction();
   const propertyId = property._id?.toString() || "";
-  const { data: interactionStateData } = useInteractionState(propertyId);
-  const [interactionState, setInteractionState] = useState<"idle" | "saved">("idle");
-
-  useEffect(() => {
-    if (interactionStateData) {
-      if (interactionStateData.hasSaved) {
-        setInteractionState("saved");
-      } else {
-        setInteractionState("idle");
-      }
-    }
-  }, [interactionStateData]);
-
-  const handleSave = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (!session) return;
-    trackInteraction.mutate(
-      { propertyId, type: "save" },
-      {
-        onSuccess: () => {
-          setInteractionState("saved");
-          toast.success("Property saved");
-        },
-        onError: () => {
-          toast.error("Failed to save property");
-        },
-      }
-    );
-  };
 
   return (
     <motion.div
@@ -123,21 +88,7 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
         </div>
       </Link>
 
-      <div className="flex gap-2 px-4 pb-4">
-        {session && (
-          <button
-            onClick={handleSave}
-            disabled={trackInteraction.isPending || interactionState === "saved"}
-            aria-label={`Save ${property.title}`}
-            className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
-              interactionState === "saved"
-                ? "bg-green-100 text-green-700"
-                : "bg-primary/10 text-primary hover:bg-primary/20"
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            {interactionState === "saved" ? "Saved ✓" : "Save"}
-          </button>
-        )}
+      <div className="px-4 pb-4">
         <span className="rounded-lg bg-primary/10 px-3 py-1 text-center text-xs font-medium text-primary">
           View Details
         </span>
