@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,7 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
   const propertyId = property._id?.toString() || "";
   const { data: interactionStateData } = useInteractionState(propertyId);
   const [interactionState, setInteractionState] = useState<"idle" | "saved">("idle");
+  const viewTrackedRef = useRef(false);
 
   useEffect(() => {
     if (interactionStateData) {
@@ -36,7 +37,8 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
   }, [interactionStateData]);
 
   useEffect(() => {
-    if (session && property._id) {
+    if (session && property._id && !viewTrackedRef.current) {
+      viewTrackedRef.current = true;
       trackInteraction.mutate({
         propertyId: property._id.toString(),
         type: "view",
