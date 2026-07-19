@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Property } from "@/../../rentivo-server/src/types";
+import { ImageManager } from "./ImageManager";
 
 const propertyFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
@@ -15,6 +16,7 @@ const propertyFormSchema = z.object({
   location: z.string().min(2, "Location is required"),
   propertyType: z.enum(["apartment", "house", "room", "studio", "villa"]),
   status: z.enum(["active", "pending", "archived"]),
+  images: z.array(z.string().url()).min(1, "At least one image is required").max(6, "Maximum 6 images allowed"),
 });
 
 type PropertyFormData = z.infer<typeof propertyFormSchema>;
@@ -29,13 +31,13 @@ const propertyTypes = ["apartment", "house", "room", "studio", "villa"] as const
 const propertyStatuses = ["active", "pending", "archived"] as const;
 
 export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormProps) => {
-  const [imageUrls, setImageUrls] = useState<string[]>(initialData?.images?.length ? initialData.images : [""]);
-  const [imageError, setImageError] = useState("");
+  const [images, setImages] = useState<string[]>(initialData?.images || []);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<PropertyFormData>({
     resolver: zodResolver(propertyFormSchema),
     defaultValues: {
@@ -45,34 +47,20 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
       location: initialData?.location || "",
       propertyType: initialData?.propertyType || "apartment",
       status: initialData?.status || "active",
+      images: initialData?.images || [],
     },
   });
 
-  const addImageUrl = () => {
-    if (imageUrls.length < 6) setImageUrls([...imageUrls, ""]);
-  };
-
-  const removeImageUrl = (index: number) => {
-    setImageUrls(imageUrls.filter((_, i) => i !== index));
-  };
-
-  const updateImageUrl = (index: number, value: string) => {
-    const updated = [...imageUrls];
-    updated[index] = value;
-    setImageUrls(updated);
+  const handleImagesChange = (newImages: string[]) => {
+    setImages(newImages);
+    setValue("images", newImages, { shouldValidate: true });
   };
 
   const onFormSubmit = (data: PropertyFormData) => {
-    const validUrls = imageUrls.filter((url) => url.trim());
-    if (validUrls.length === 0) {
-      setImageError("At least one image URL is required");
-      return;
-    }
-    setImageError("");
     onSubmit({
       ...data,
       price: Number(data.price),
-      images: validUrls,
+      images,
     });
   };
 
@@ -176,37 +164,9 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1.5">Image URLs</label>
-        <div className="space-y-2">
-          {imageUrls.map((url, i) => (
-            <div key={i} className="flex gap-2">
-              <Input
-                value={url}
-                onChange={(e) => updateImageUrl(i, e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                aria-label={`Image URL ${i + 1}`}
-              />
-              {imageUrls.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeImageUrl(i)}
-                  aria-label={`Remove image ${i + 1}`}
-                  className="shrink-0 min-h-[44px] min-w-[44px]"
-                >
-                  ×
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
-        {imageUrls.length < 6 && (
-          <Button type="button" variant="outline" size="sm" className="mt-2" onClick={addImageUrl}>
-            + Add Image
-          </Button>
-        )}
-        {imageError && <p className="mt-1 text-sm text-destructive">{imageError}</p>}
+        <label className="block text-sm font-medium mb-1.5">Property Images</label>
+        <ImageManager images={images} onChange={handleImagesChange} />
+        {errors.images && <p className="mt-1 text-sm text-destructive">{errors.images.message}</p>}
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
