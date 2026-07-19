@@ -18,6 +18,9 @@ interface PropertyCardProps {
     location: string;
     propertyType: string;
     images: string[];
+    bedrooms?: number;
+    bathrooms?: number;
+    amenities?: string[];
     averageRating?: number | null;
     reviewCount?: number;
   };
@@ -93,6 +96,15 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
           </div>
 
           <p className="text-sm text-muted-foreground">{property.location}</p>
+
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            {property.bedrooms != null && (
+              <span>{property.bedrooms === 0 ? "Studio" : `${property.bedrooms} bed`}</span>
+            )}
+            {property.bathrooms != null && (
+              <span>{property.bathrooms} bath</span>
+            )}
+          </div>
 
           {property.averageRating != null && (
             <div className="flex items-center gap-1 text-sm" aria-label={`Rating: ${property.averageRating.toFixed(1)} out of 5 stars`}>

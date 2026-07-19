@@ -71,6 +71,9 @@ export const PropertyManagementTable = () => {
           <div className="col-span-3">
             <p className="font-medium line-clamp-1">{property.title}</p>
             <p className="text-sm text-muted-foreground">{property.location}</p>
+            <p className="text-xs text-muted-foreground">
+              {property.bedrooms === 0 ? "Studio" : `${property.bedrooms} bed`} · {property.bathrooms} bath
+            </p>
           </div>
 
           <div className="col-span-1">

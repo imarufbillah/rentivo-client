@@ -153,6 +153,32 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
               {property.description}
             </p>
           </div>
+
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            {property.bedrooms != null && (
+              <div>
+                <span className="font-medium">Bedrooms</span>
+                <p className="text-muted-foreground">{property.bedrooms === 0 ? "Studio" : property.bedrooms}</p>
+              </div>
+            )}
+            {property.bathrooms != null && (
+              <div>
+                <span className="font-medium">Bathrooms</span>
+                <p className="text-muted-foreground">{property.bathrooms}</p>
+              </div>
+            )}
+          </div>
+
+          {property.amenities && property.amenities.length > 0 && (
+            <div>
+              <h2 className="mb-2 font-semibold">Amenities</h2>
+              <div className="flex flex-wrap gap-2">
+                {property.amenities.map((amenity) => (
+                  <Badge key={amenity} variant="secondary" className="capitalize">{amenity}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
