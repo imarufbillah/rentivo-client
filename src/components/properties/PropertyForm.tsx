@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Property } from "@/../../rentivo-server/src/types";
+import { Property, PropertyStatus } from "@/../../rentivo-server/src/types";
 import { ImageManager } from "./ImageManager";
 
 const amenitiesList = [
@@ -40,7 +40,7 @@ const propertyFormSchema = z.object({
   price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Price must be positive"),
   location: z.string().min(2, "Location is required"),
   propertyType: z.enum(["apartment", "house", "room", "studio", "villa"]),
-  status: z.enum(["active", "pending", "archived"]),
+  status: z.enum(["active", "pending", "archived", "rented"]),
   images: z.array(z.string().url()).min(1, "At least one image is required").max(6, "Maximum 6 images allowed"),
   bedrooms: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, "Bedrooms must be 0 or more"),
   bathrooms: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, "Bathrooms must be 0 or more"),
@@ -55,7 +55,7 @@ interface PropertyFormProps {
 }
 
 const propertyTypes = ["apartment", "house", "room", "studio", "villa"] as const;
-const propertyStatuses = ["active", "pending", "archived"] as const;
+const propertyStatuses: readonly PropertyStatus[] = ["active", "pending", "archived", "rented"];
 
 export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormProps) => {
   const [images, setImages] = useState<string[]>(initialData?.images || []);

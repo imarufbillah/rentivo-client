@@ -11,6 +11,7 @@ import { PricingSection } from "./PricingSection";
 import { PolicySection } from "./PolicySection";
 import { RulesSection } from "./RulesSection";
 import { OwnerCard } from "./OwnerCard";
+import { RentButton } from "./RentButton";
 import { ReviewList } from "@/components/reviews/ReviewList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { useTrackInteraction, useInteractionState } from "@/hooks/useInteractions";
@@ -32,6 +33,8 @@ export const PropertyDetails = ({ property, owner, relatedProperties = [] }: Pro
   const { data: interactionStateData } = useInteractionState(propertyId);
   const [interactionState, setInteractionState] = useState<"idle" | "saved">("idle");
   const viewTrackedRef = useRef(false);
+
+  const isOwner = !!session && !!owner && session.user.id === owner._id?.toString();
 
   useEffect(() => {
     if (interactionStateData) {
@@ -126,6 +129,8 @@ export const PropertyDetails = ({ property, owner, relatedProperties = [] }: Pro
               {interactionState === "saved" ? "Saved ✓" : "Save Property"}
             </Button>
           )}
+
+          {session && <RentButton property={property} isOwner={isOwner} />}
 
           <PropertyInfoGrid property={property} />
 
