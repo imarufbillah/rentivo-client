@@ -100,3 +100,10 @@ export const useRelatedProperties = (location: string, propertyType: string, exc
     enabled: !!location && !!propertyType && !!excludeId,
   });
 };
+
+export const useAmenities = () => {
+  return useQuery({
+    queryKey: ['properties', 'amenities'],
+    queryFn: () => apiClient.get<{ amenities: string[] }>('/api/properties/amenities'),
+  });
+};

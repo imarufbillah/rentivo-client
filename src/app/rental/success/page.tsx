@@ -1,29 +1,45 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Home, ArrowRight } from "lucide-react";
+import { CheckCircle, Home, ArrowRight, Loader2 } from "lucide-react";
+import { useConfirmRental } from "@/hooks/useRentals";
 
 const RentalSuccessPage = ({ searchParams }: { searchParams: Promise<{ session_id?: string }> }) => {
   const { session_id } = use(searchParams);
+  const confirmRental = useConfirmRental();
+  const [confirmed, setConfirmed] = useState(false);
+
+  useEffect(() => {
+    if (session_id && !confirmed && !confirmRental.isPending) {
+      confirmRental.mutate(session_id, {
+        onSuccess: (data) => {
+          setConfirmed(data.confirmed);
+        },
+      });
+    }
+  }, [session_id]);
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
       <div className="rounded-full bg-success/10 p-4">
-        <CheckCircle className="h-12 w-12 text-success" />
+        {confirmRental.isPending ? (
+          <Loader2 className="h-12 w-12 text-primary animate-spin" />
+        ) : (
+          <CheckCircle className="h-12 w-12 text-success" />
+        )}
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold">Rental Confirmed!</h1>
+        <h1 className="text-2xl font-bold">
+          {confirmRental.isPending ? "Confirming Payment..." : "Rental Confirmed!"}
+        </h1>
         <p className="mt-2 text-muted-foreground">
-          Your payment has been processed successfully. You are now a tenant!
+          {confirmRental.isPending
+            ? "Verifying your payment with Stripe..."
+            : "Your payment has been processed successfully. You are now a tenant!"}
         </p>
-        {session_id && (
-          <p className="mt-1 text-xs text-muted-foreground/70">
-            Session: {session_id.slice(0, 20)}...
-          </p>
-        )}
       </div>
 
       <div className="flex gap-3">
@@ -34,7 +50,7 @@ const RentalSuccessPage = ({ searchParams }: { searchParams: Promise<{ session_i
           </Button>
         </Link>
         <Link href="/history">
-          <Button>
+          <Button disabled={confirmRental.isPending}>
             View History
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>

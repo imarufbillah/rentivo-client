@@ -33,3 +33,26 @@ export const useMyRentals = () => {
     queryFn: () => apiClient.get<{ rentals: Rental[] }>('/api/rentals/my'),
   });
 };
+
+export const useConfirmRental = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (sessionId: string) =>
+      apiClient.post<{ confirmed: boolean; rental: Rental | null }>('/api/rentals/confirm', { sessionId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: ['rental-status'] });
+    },
+  });
+};
+
+export const useCancelPendingRental = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (propertyId: string) =>
+      apiClient.post<{ cancelled: boolean }>('/api/rentals/cancel', { propertyId }),
+    onSuccess: (_, propertyId) => {
+      queryClient.invalidateQueries({ queryKey: ['rental-status', propertyId] });
+    },
+  });
+};

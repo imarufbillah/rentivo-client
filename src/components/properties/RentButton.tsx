@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Property } from "@/../../rentivo-server/src/types";
-import { usePropertyRentalStatus } from "@/hooks/useRentals";
 import { RentConfirmationDialog } from "./RentConfirmationDialog";
-import { Home, Loader2 } from "lucide-react";
+import { Home } from "lucide-react";
 
 interface RentButtonProps {
   property: Property;
@@ -14,21 +13,10 @@ interface RentButtonProps {
 
 export const RentButton = ({ property, isOwner }: RentButtonProps) => {
   const [showDialog, setShowDialog] = useState(false);
-  const propertyId = property._id?.toString() || "";
-  const { data: rentalStatus, isLoading } = usePropertyRentalStatus(propertyId);
 
   if (isOwner) return null;
 
-  if (isLoading) {
-    return (
-      <Button disabled className="w-full">
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        Checking availability...
-      </Button>
-    );
-  }
-
-  if (property.status === "rented" || rentalStatus?.isRented) {
+  if (property.status === "rented") {
     return (
       <Button disabled variant="outline" className="w-full">
         <Home className="mr-2 h-4 w-4" />
