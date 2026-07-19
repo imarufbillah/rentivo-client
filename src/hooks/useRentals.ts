@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
-import { Rental } from '@/../../rentivo-server/src/types';
+import { Rental, RentalWithProperty } from '@/../../rentivo-server/src/types';
 
 interface CheckoutResult {
   checkoutUrl: string;
@@ -30,7 +30,7 @@ export const usePropertyRentalStatus = (propertyId: string) => {
 export const useMyRentals = () => {
   return useQuery({
     queryKey: ['rentals', 'my'],
-    queryFn: () => apiClient.get<{ rentals: Rental[] }>('/api/rentals/my'),
+    queryFn: () => apiClient.get<{ rentals: RentalWithProperty[] }>('/api/rentals/my'),
   });
 };
 

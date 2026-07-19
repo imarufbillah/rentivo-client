@@ -5,15 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useInteractionHistory, useDeleteInteraction } from "@/hooks/useInteractions";
+import { useMyRentals } from "@/hooks/useRentals";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Heart } from "lucide-react";
+import { Eye, Heart, Key } from "lucide-react";
 import { toast } from "sonner";
 
 const typeFilters = [
   { value: "all", label: "All" },
   { value: "saved", label: "Saved" },
   { value: "viewed", label: "Viewed" },
+  { value: "rentals", label: "Rentals" },
 ];
 
 const typeColors: Record<string, string> = {
@@ -31,10 +33,18 @@ const typeLabels: Record<string, string> = {
   view: "Viewed",
 };
 
+const rentalStatusColors: Record<string, string> = {
+  active: "bg-success/10 text-success",
+  pending: "bg-warning/10 text-warning",
+  completed: "bg-muted text-muted-foreground",
+  cancelled: "bg-destructive/10 text-destructive",
+};
+
 const InteractionHistoryPage = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [page, setPage] = useState(1);
   const deleteInteraction = useDeleteInteraction();
+  const { data: rentalsData, isLoading: rentalsLoading } = useMyRentals();
 
   const filterType = activeFilter === "all" ? undefined :
     activeFilter === "saved" ? "save" : "view";
@@ -57,13 +67,16 @@ const InteractionHistoryPage = () => {
     );
   };
 
+  const showRentals = activeFilter === "rentals";
+  const showInteractions = !showRentals;
+
   return (
     <ProtectedRoute>
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">Interaction History</h1>
+          <h1 className="text-3xl font-bold">History</h1>
           <p className="mt-2 text-muted-foreground">
-            Your browsing and saving activity.
+            Your browsing, saving activity, and rental history.
           </p>
         </div>
 
@@ -86,127 +99,205 @@ const InteractionHistoryPage = () => {
           ))}
         </div>
 
-        {isLoading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-24 animate-pulse rounded-xl bg-muted"
-              />
-            ))}
-          </div>
-        ) : error ? (
-          <div className="rounded-xl border p-8 text-center">
-            <p className="text-muted-foreground">
-              Failed to load interaction history. Please try again later.
-            </p>
-          </div>
-        ) : interactions.length > 0 ? (
-          <>
-            <div className="space-y-3">
-              {interactions.filter((i) => typeIcons[i.type]).map((interaction) => {
-                const Icon = typeIcons[interaction.type];
-                return (
-                  <div
-                    key={interaction._id?.toString()}
-                    className="flex items-center gap-4 rounded-xl border p-4 hover:bg-muted/50 transition-colors"
-                  >
-                    {interaction.property?.images?.[0] ? (
-                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
-                        <Image
-                          src={interaction.property.images[0]}
-                          alt={interaction.property.title}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
-                        />
-                      </div>
-                    ) : (
-                      <div className="h-16 w-16 shrink-0 rounded-lg bg-muted flex items-center justify-center">
-                        <Icon className="h-6 w-6 text-muted-foreground" />
-                      </div>
-                    )}
-
-                    <div className="flex-1 min-w-0">
-                      {interaction.property ? (
-                        <Link
-                          href={`/properties/${interaction.property._id}`}
-                          className="font-medium hover:underline line-clamp-1"
-                        >
-                          {interaction.property.title}
-                        </Link>
-                      ) : (
-                        <p className="font-medium text-muted-foreground line-clamp-1">
-                          Property removed
-                        </p>
-                      )}
-                      <p className="text-sm text-muted-foreground">
-                        {interaction.property?.location || "Unknown location"}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <Badge className={typeColors[interaction.type]}>
-                        <Icon className="h-3 w-3 mr-1" />
-                        {typeLabels[interaction.type]}
-                      </Badge>
-
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        {new Date(interaction.createdAt).toLocaleDateString()}
-                      </span>
-
-                      {interaction.type === "save" && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            handleUndo(interaction.propertyId.toString(), interaction.type)
-                          }
-                          disabled={deleteInteraction.isPending}
-                        >
-                          Undo
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+        {showRentals ? (
+          rentalsLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-24 animate-pulse rounded-xl bg-muted" />
+              ))}
             </div>
+          ) : rentalsData?.rentals && rentalsData.rentals.length > 0 ? (
+            <div className="space-y-3">
+              {rentalsData.rentals.map((rental) => (
+                <div
+                  key={rental._id?.toString()}
+                  className="flex items-center gap-4 rounded-xl border p-4 hover:bg-muted/50 transition-colors"
+                >
+                  {rental.property?.images?.[0] ? (
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
+                      <Image
+                        src={rental.property.images[0]}
+                        alt={rental.property.title}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-16 w-16 shrink-0 rounded-lg bg-muted flex items-center justify-center">
+                      <Key className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                  )}
 
-            {pagination && pagination.totalPages > 1 && (
-              <div className="mt-6 flex items-center justify-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                >
-                  Previous
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  Page {page} of {pagination.totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
-                  disabled={page === pagination.totalPages}
-                >
-                  Next
-                </Button>
-              </div>
-            )}
-          </>
+                  <div className="flex-1 min-w-0">
+                    {rental.property ? (
+                      <Link
+                        href={`/properties/${rental.property._id}`}
+                        className="font-medium hover:underline line-clamp-1"
+                      >
+                        {rental.property.title}
+                      </Link>
+                    ) : (
+                      <p className="font-medium text-muted-foreground line-clamp-1">
+                        Property removed
+                      </p>
+                    )}
+                    <p className="text-sm text-muted-foreground">
+                      {rental.property?.location || "Unknown location"}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Badge className={rentalStatusColors[rental.status] || "bg-muted text-muted-foreground"}>
+                      {rental.status.charAt(0).toUpperCase() + rental.status.slice(1)}
+                    </Badge>
+
+                    <div className="text-right">
+                      <p className="text-sm font-medium">${rental.monthlyRent.toLocaleString()}/mo</p>
+                      <p className="text-xs text-muted-foreground">{rental.leaseDuration} months</p>
+                    </div>
+
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      {new Date(rental.startDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border p-12 text-center">
+              <h2 className="text-xl font-semibold">No rentals yet</h2>
+              <p className="mt-2 text-muted-foreground">
+                Rent a property to see your rental history here.
+              </p>
+              <Link href="/properties" className="mt-6 inline-block">
+                <Button>Browse Properties</Button>
+              </Link>
+            </div>
+          )
         ) : (
-          <div className="rounded-xl border p-12 text-center">
-            <h2 className="text-xl font-semibold">No interactions yet</h2>
-            <p className="mt-2 text-muted-foreground">
-              Start browsing properties to build your interaction history.
-            </p>
-            <Link href="/properties" className="mt-6 inline-block">
-              <Button>Browse Properties</Button>
-            </Link>
-          </div>
+          isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-24 animate-pulse rounded-xl bg-muted"
+                />
+              ))}
+            </div>
+          ) : error ? (
+            <div className="rounded-xl border p-8 text-center">
+              <p className="text-muted-foreground">
+                Failed to load interaction history. Please try again later.
+              </p>
+            </div>
+          ) : interactions.length > 0 ? (
+            <>
+              <div className="space-y-3">
+                {interactions.filter((i) => typeIcons[i.type]).map((interaction) => {
+                  const Icon = typeIcons[interaction.type];
+                  return (
+                    <div
+                      key={interaction._id?.toString()}
+                      className="flex items-center gap-4 rounded-xl border p-4 hover:bg-muted/50 transition-colors"
+                    >
+                      {interaction.property?.images?.[0] ? (
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
+                          <Image
+                            src={interaction.property.images[0]}
+                            alt={interaction.property.title}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
+                        </div>
+                      ) : (
+                        <div className="h-16 w-16 shrink-0 rounded-lg bg-muted flex items-center justify-center">
+                          <Icon className="h-6 w-6 text-muted-foreground" />
+                        </div>
+                      )}
+
+                      <div className="flex-1 min-w-0">
+                        {interaction.property ? (
+                          <Link
+                            href={`/properties/${interaction.property._id}`}
+                            className="font-medium hover:underline line-clamp-1"
+                          >
+                            {interaction.property.title}
+                          </Link>
+                        ) : (
+                          <p className="font-medium text-muted-foreground line-clamp-1">
+                            Property removed
+                          </p>
+                        )}
+                        <p className="text-sm text-muted-foreground">
+                          {interaction.property?.location || "Unknown location"}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Badge className={typeColors[interaction.type]}>
+                          <Icon className="h-3 w-3 mr-1" />
+                          {typeLabels[interaction.type]}
+                        </Badge>
+
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          {new Date(interaction.createdAt).toLocaleDateString()}
+                        </span>
+
+                        {interaction.type === "save" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              handleUndo(interaction.propertyId.toString(), interaction.type)
+                            }
+                            disabled={deleteInteraction.isPending}
+                          >
+                            Undo
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {pagination && pagination.totalPages > 1 && (
+                <div className="mt-6 flex items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Page {page} of {pagination.totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
+                    disabled={page === pagination.totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="rounded-xl border p-12 text-center">
+              <h2 className="text-xl font-semibold">No interactions yet</h2>
+              <p className="mt-2 text-muted-foreground">
+                Start browsing properties to build your interaction history.
+              </p>
+              <Link href="/properties" className="mt-6 inline-block">
+                <Button>Browse Properties</Button>
+              </Link>
+            </div>
+          )
         )}
       </div>
     </ProtectedRoute>
