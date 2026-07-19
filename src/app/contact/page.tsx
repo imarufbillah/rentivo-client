@@ -20,10 +20,10 @@ const ContactPage = () => {
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="text-center">
-        <h1 className="font-display text-4xl font-bold tracking-tight">
+        <h1 className="font-display text-4xl font-bold tracking-tight text-balance">
           Contact Us
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
+        <p className="mx-auto mt-4 max-w-xl text-lg text-pretty text-muted-foreground">
           Have a question or need help? We would love to hear from you.
         </p>
       </div>

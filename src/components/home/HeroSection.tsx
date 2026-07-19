@@ -29,7 +29,7 @@ export const HeroSection = () => {
 
         {/* Heading */}
         <motion.h1
-          className="font-display text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl"
+          className="font-display text-5xl font-extrabold tracking-tight text-balance sm:text-6xl lg:text-7xl"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
@@ -41,7 +41,7 @@ export const HeroSection = () => {
 
         {/* Subtitle */}
         <motion.p
-          className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground"
+          className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
@@ -58,7 +58,7 @@ export const HeroSection = () => {
           transition={{ duration: 0.6, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
         >
           <Link href="/properties">
-            <div className="group flex items-center gap-3 rounded-2xl border bg-card px-5 py-4 shadow-md transition-all hover:shadow-lg">
+            <div className="group flex items-center gap-3 rounded-2xl border bg-card px-5 py-4 shadow-md transition-all duration-300 hover:shadow-lg">
               <Search className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-primary" />
               <span className="flex-1 text-left text-muted-foreground">
                 Search by location, type, or keyword...

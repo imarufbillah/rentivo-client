@@ -4,10 +4,10 @@ const AboutPage = () => {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="text-center">
-        <h1 className="font-display text-4xl font-bold tracking-tight">
+        <h1 className="font-display text-4xl font-bold tracking-tight text-balance">
           About Rentivo
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-pretty text-muted-foreground">
           We are on a mission to make finding your next rental home simple,
           smart, and stress-free.
         </p>

@@ -15,10 +15,10 @@ export const CTASection = () => {
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          <h2 className="font-display text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-balance text-primary-foreground sm:text-4xl">
             Ready to Find Your Home?
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-primary-foreground/80">
+          <p className="mx-auto mt-4 max-w-xl text-lg text-pretty text-primary-foreground/80">
             Join hundreds of happy renters who found their perfect property
             through Rentivo. Start your search today.
           </p>

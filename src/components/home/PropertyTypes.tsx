@@ -42,7 +42,7 @@ export const PropertyTypes = () => {
     <section className="py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-balance sm:text-4xl">
             Explore by Property Type
           </h2>
           <p className="mt-3 text-lg text-muted-foreground">
