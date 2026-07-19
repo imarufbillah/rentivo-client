@@ -23,14 +23,12 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
   const { data: reviewData } = useReviews(property._id?.toString() || "");
   const propertyId = property._id?.toString() || "";
   const { data: interactionStateData } = useInteractionState(propertyId);
-  const [interactionState, setInteractionState] = useState<"idle" | "saved" | "dismissed">("idle");
+  const [interactionState, setInteractionState] = useState<"idle" | "saved">("idle");
 
   useEffect(() => {
     if (interactionStateData) {
       if (interactionStateData.hasSaved) {
         setInteractionState("saved");
-      } else if (interactionStateData.hasDismissed) {
-        setInteractionState("dismissed");
       } else {
         setInteractionState("idle");
       }
@@ -57,22 +55,6 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
         },
         onError: () => {
           toast.error("Failed to save property. Please try again.");
-        },
-      }
-    );
-  };
-
-  const handleDismiss = () => {
-    if (!session || !property._id) return;
-    trackInteraction.mutate(
-      { propertyId: property._id.toString(), type: "dismiss" },
-      {
-        onSuccess: () => {
-          setInteractionState("dismissed");
-          toast.success("Property dismissed");
-        },
-        onError: () => {
-          toast.error("Failed to dismiss property. Please try again.");
         },
       }
     );
@@ -159,14 +141,6 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
                 disabled={trackInteraction.isPending || interactionState === "saved"}
               >
                 {interactionState === "saved" ? "Saved ✓" : "Save Property"}
-              </Button>
-              <Button
-                onClick={handleDismiss}
-                variant="outline"
-                className="flex-1"
-                disabled={trackInteraction.isPending || interactionState === "dismissed"}
-              >
-                {interactionState === "dismissed" ? "Dismissed" : "Dismiss"}
               </Button>
             </div>
           )}

@@ -7,31 +7,27 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useInteractionHistory, useDeleteInteraction } from "@/hooks/useInteractions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Heart, Star, X } from "lucide-react";
+import { Eye, Heart } from "lucide-react";
 import { toast } from "sonner";
 
 const typeFilters = [
   { value: "all", label: "All" },
   { value: "saved", label: "Saved" },
-  { value: "dismissed", label: "Dismissed" },
   { value: "viewed", label: "Viewed" },
 ];
 
 const typeColors: Record<string, string> = {
   save: "bg-success/10 text-success",
-  dismiss: "bg-muted text-muted-foreground",
   view: "bg-primary/10 text-primary",
 };
 
 const typeIcons: Record<string, typeof Eye> = {
   save: Heart,
-  dismiss: X,
   view: Eye,
 };
 
 const typeLabels: Record<string, string> = {
   save: "Saved",
-  dismiss: "Dismissed",
   view: "Viewed",
 };
 
@@ -41,8 +37,7 @@ const InteractionHistoryPage = () => {
   const deleteInteraction = useDeleteInteraction();
 
   const filterType = activeFilter === "all" ? undefined :
-    activeFilter === "saved" ? "save" :
-    activeFilter === "dismissed" ? "dismiss" : "view";
+    activeFilter === "saved" ? "save" : "view";
 
   const { data, isLoading, error } = useInteractionHistory(filterType, page);
   const interactions = data?.interactions || [];
@@ -50,7 +45,7 @@ const InteractionHistoryPage = () => {
 
   const handleUndo = (propertyId: string, type: string) => {
     deleteInteraction.mutate(
-      { propertyId, type: type as "save" | "dismiss" | "view" },
+      { propertyId, type: type as "save" | "view" },
       {
         onSuccess: () => {
           toast.success("Interaction removed");
@@ -68,7 +63,7 @@ const InteractionHistoryPage = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Interaction History</h1>
           <p className="mt-2 text-muted-foreground">
-            Your browsing, saving, and dismiss activity.
+            Your browsing and saving activity.
           </p>
         </div>
 
@@ -160,7 +155,7 @@ const InteractionHistoryPage = () => {
                         {new Date(interaction.createdAt).toLocaleDateString()}
                       </span>
 
-                      {(interaction.type === "save" || interaction.type === "dismiss") && (
+                      {interaction.type === "save" && (
                         <Button
                           variant="ghost"
                           size="sm"

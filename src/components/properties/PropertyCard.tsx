@@ -28,14 +28,12 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
   const trackInteraction = useTrackInteraction();
   const propertyId = property._id?.toString() || "";
   const { data: interactionStateData } = useInteractionState(propertyId);
-  const [interactionState, setInteractionState] = useState<"idle" | "saved" | "dismissed">("idle");
+  const [interactionState, setInteractionState] = useState<"idle" | "saved">("idle");
 
   useEffect(() => {
     if (interactionStateData) {
       if (interactionStateData.hasSaved) {
         setInteractionState("saved");
-      } else if (interactionStateData.hasDismissed) {
-        setInteractionState("dismissed");
       } else {
         setInteractionState("idle");
       }
@@ -54,23 +52,6 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
         },
         onError: () => {
           toast.error("Failed to save property");
-        },
-      }
-    );
-  };
-
-  const handleDismiss = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (!session) return;
-    trackInteraction.mutate(
-      { propertyId, type: "dismiss" },
-      {
-        onSuccess: () => {
-          setInteractionState("dismissed");
-          toast.success("Property dismissed");
-        },
-        onError: () => {
-          toast.error("Failed to dismiss property");
         },
       }
     );
@@ -138,18 +119,6 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {interactionState === "saved" ? "Saved ✓" : "Save"}
-          </button>
-          <button
-            onClick={handleDismiss}
-            disabled={trackInteraction.isPending || interactionState === "dismissed"}
-            aria-label={`Dismiss ${property.title}`}
-            className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
-              interactionState === "dismissed"
-                ? "bg-muted text-muted-foreground/70"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            {interactionState === "dismissed" ? "Dismissed" : "Dismiss"}
           </button>
         </div>
       )}

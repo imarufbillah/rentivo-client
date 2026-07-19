@@ -6,7 +6,7 @@ interface InteractionHistoryItem {
   _id?: string;
   userId: string;
   propertyId: string;
-  type: 'view' | 'save' | 'dismiss';
+  type: 'view' | 'save';
   createdAt: string;
   property: Property | null;
 }
@@ -24,18 +24,17 @@ interface InteractionHistoryResponse {
 export interface InteractionState {
   hasViewed: boolean;
   hasSaved: boolean;
-  hasDismissed: boolean;
 }
 
 export const useTrackInteraction = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { propertyId: string; type: 'view' | 'save' | 'dismiss' }) =>
+    mutationFn: (data: { propertyId: string; type: 'view' | 'save' }) =>
       apiClient.post('/api/interactions', data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['interactions', 'state', variables.propertyId] });
-      if (variables.type === 'save' || variables.type === 'dismiss') {
+      if (variables.type === 'save') {
         queryClient.invalidateQueries({ queryKey: ['recommendations'] });
       }
       queryClient.invalidateQueries({ queryKey: ['interactions'] });
@@ -75,7 +74,7 @@ export const useDeleteInteraction = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { propertyId: string; type: 'view' | 'save' | 'dismiss' }) =>
+    mutationFn: (data: { propertyId: string; type: 'view' | 'save' }) =>
       apiClient.delete('/api/interactions', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interactions'] });
