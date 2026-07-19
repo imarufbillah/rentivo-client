@@ -77,6 +77,9 @@ describe('useCreateProperty', () => {
       propertyType: 'apartment',
       images: ['https://example.com/img.jpg'],
       status: 'active',
+      bedrooms: 1,
+      bathrooms: 1,
+      amenities: ['wifi'],
     });
 
     expect(apiClient.post).toHaveBeenCalled();
