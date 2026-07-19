@@ -5,6 +5,49 @@ import { Button } from "@/components/ui/button";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { PropertyManagementTable } from "@/components/properties/PropertyManagementTable";
+import { useMyProperties } from "@/hooks/useProperties";
+import { Eye, Heart, Star, Home } from "lucide-react";
+
+const SummaryCards = () => {
+  const { data } = useMyProperties();
+  const properties = data?.properties || [];
+
+  const totals = properties.reduce(
+    (acc, p) => ({
+      views: acc.views + p.viewCount,
+      saves: acc.saves + p.saveCount,
+      reviews: acc.reviews + p.totalReviews,
+      properties: acc.properties + 1,
+    }),
+    { views: 0, saves: 0, reviews: 0, properties: 0 }
+  );
+
+  const avgRating =
+    properties.length > 0
+      ? properties.reduce((acc, p) => acc + (p.averageRating || 0), 0) / properties.length
+      : 0;
+
+  const cards = [
+    { label: "Properties", value: totals.properties, icon: Home },
+    { label: "Total Views", value: totals.views, icon: Eye },
+    { label: "Total Saves", value: totals.saves, icon: Heart },
+    { label: "Avg Rating", value: avgRating > 0 ? avgRating.toFixed(1) : "—", icon: Star },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-4 mb-8 sm:grid-cols-4">
+      {cards.map((card) => (
+        <div key={card.label} className="rounded-xl border p-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <card.icon className="h-4 w-4" />
+            {card.label}
+          </div>
+          <p className="mt-2 text-2xl font-bold">{card.value}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const ManagePropertiesPage = () => {
   return (
@@ -23,6 +66,7 @@ const ManagePropertiesPage = () => {
             </Link>
           </div>
 
+          <SummaryCards />
           <PropertyManagementTable />
         </div>
       </RoleGuard>

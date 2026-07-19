@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
-import { Property, PaginatedResult, PropertyFilters } from '@/../../rentivo-server/src/types';
+import { Property, PropertyWithStats, PaginatedResult, PropertyFilters } from '@/../../rentivo-server/src/types';
 
 interface PropertyFiltersParams {
   search?: string;
@@ -67,7 +67,7 @@ export const useDeleteProperty = () => {
 export const useMyProperties = () => {
   return useQuery({
     queryKey: ['properties', 'my'],
-    queryFn: () => apiClient.get<{ properties: Property[] }>('/api/properties/my-properties'),
+    queryFn: () => apiClient.get<{ properties: PropertyWithStats[] }>('/api/properties/my-properties'),
   });
 };
 

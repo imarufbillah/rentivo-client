@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useMyProperties, useDeleteProperty } from "@/hooks/useProperties";
-import { Property } from "@/../../rentivo-server/src/types";
+import { PropertyWithStats } from "@/../../rentivo-server/src/types";
+import { Eye, Heart, Star } from "lucide-react";
 
 const statusColors: Record<string, string> = {
   active: "bg-success/10 text-success",
@@ -57,35 +58,51 @@ export const PropertyManagementTable = () => {
   return (
     <div className="space-y-4">
       <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-2 text-sm font-medium text-muted-foreground">
-        <div className="col-span-4">Property</div>
-        <div className="col-span-2">Price</div>
-        <div className="col-span-2">Status</div>
-        <div className="col-span-2">Type</div>
-        <div className="col-span-2 text-right">Actions</div>
+        <div className="col-span-3">Property</div>
+        <div className="col-span-1">Price</div>
+        <div className="col-span-1">Status</div>
+        <div className="col-span-1">Type</div>
+        <div className="col-span-2 text-center">Stats</div>
+        <div className="col-span-3 text-right">Actions</div>
       </div>
 
-      {properties.map((property: Property) => (
+      {properties.map((property: PropertyWithStats) => (
         <div key={property._id?.toString()} className="flex flex-col gap-3 rounded-xl border p-4 md:grid md:grid-cols-12 md:items-center md:gap-4 md:p-4">
-          <div className="col-span-4">
+          <div className="col-span-3">
             <p className="font-medium line-clamp-1">{property.title}</p>
             <p className="text-sm text-muted-foreground">{property.location}</p>
           </div>
 
-          <div className="col-span-2">
+          <div className="col-span-1">
             <span className="font-semibold">${property.price.toLocaleString()}/mo</span>
           </div>
 
-          <div className="col-span-2">
+          <div className="col-span-1">
             <Badge className={statusColors[property.status]}>
               {property.status}
             </Badge>
           </div>
 
-          <div className="col-span-2">
+          <div className="col-span-1">
             <span className="text-sm capitalize">{property.propertyType}</span>
           </div>
 
-          <div className="col-span-2 flex justify-end gap-2">
+          <div className="col-span-2 flex items-center justify-center gap-4 text-sm">
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Eye className="h-4 w-4" />
+              <span>{property.viewCount}</span>
+            </div>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Heart className="h-4 w-4" />
+              <span>{property.saveCount}</span>
+            </div>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Star className="h-4 w-4" />
+              <span>{property.averageRating ?? "—"}</span>
+            </div>
+          </div>
+
+          <div className="col-span-3 flex justify-end gap-2">
             <Link href={`/properties/${property._id}`}>
               <Button variant="outline" size="sm">View</Button>
             </Link>
