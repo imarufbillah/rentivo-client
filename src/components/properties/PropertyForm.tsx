@@ -12,6 +12,7 @@ import { useAmenities } from "@/hooks/useProperties";
 
 const propertyFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
+  shortDescription: z.string().max(200, "Short description must be 200 characters or less").optional(),
   description: z.string().min(20, "Description must be at least 20 characters"),
   price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Price must be positive"),
   location: z.string().min(2, "Location is required"),
@@ -106,6 +107,7 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
     resolver: zodResolver(propertyFormSchema),
     defaultValues: {
       title: initialData?.title || "",
+      shortDescription: initialData?.shortDescription || "",
       description: initialData?.description || "",
       price: initialData?.price?.toString() || "",
       location: initialData?.location || "",
@@ -189,6 +191,17 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
           aria-describedby={errors.title ? "title-error" : undefined}
         />
         {errors.title && <p id="title-error" role="alert" className="mt-1 text-sm text-destructive">{errors.title.message}</p>}
+      </div>
+
+      <div>
+        <label htmlFor="shortDescription" className="block text-sm font-medium mb-1.5">Short Description</label>
+        <Input
+          id="shortDescription"
+          {...register("shortDescription")}
+          placeholder="Brief one-liner about your property"
+          maxLength={200}
+        />
+        {errors.shortDescription && <p role="alert" className="mt-1 text-sm text-destructive">{errors.shortDescription.message}</p>}
       </div>
 
       <div>

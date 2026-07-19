@@ -13,6 +13,7 @@ interface PropertyCardProps {
   property: {
     _id?: string | { toString(): string };
     title: string;
+    shortDescription?: string;
     description: string;
     price: number;
     location: string;
@@ -97,6 +98,10 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
 
           <p className="text-sm text-muted-foreground">{property.location}</p>
 
+          {property.shortDescription && (
+            <p className="text-sm text-muted-foreground line-clamp-2">{property.shortDescription}</p>
+          )}
+
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             {property.bedrooms != null && (
               <span>{property.bedrooms === 0 ? "Studio" : `${property.bedrooms} bed`}</span>
@@ -118,8 +123,8 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
         </div>
       </Link>
 
-      {session && (
-        <div className="flex gap-2 px-4 pb-4">
+      <div className="flex gap-2 px-4 pb-4">
+        {session && (
           <button
             onClick={handleSave}
             disabled={trackInteraction.isPending || interactionState === "saved"}
@@ -132,8 +137,11 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
           >
             {interactionState === "saved" ? "Saved ✓" : "Save"}
           </button>
-        </div>
-      )}
+        )}
+        <span className="rounded-lg bg-primary/10 px-3 py-1 text-center text-xs font-medium text-primary">
+          View Details
+        </span>
+      </div>
     </motion.div>
   );
 };
