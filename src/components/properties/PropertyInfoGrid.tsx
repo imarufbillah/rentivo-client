@@ -64,13 +64,18 @@ export const PropertyInfoGrid = ({ property }: PropertyInfoGridProps) => {
   const items = infoItems(property);
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {items.map(({ icon: Icon, label, value }) => (
-        <div key={label} className="flex items-center gap-3 rounded-xl border p-3">
-          <Icon className="h-5 w-5 text-muted-foreground" />
+        <div
+          key={label}
+          className="flex items-center gap-3 rounded-2xl border bg-card p-3"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+            <Icon className="h-5 w-5" />
+          </div>
           <div>
             <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="text-sm font-medium">{value}</p>
+            <p className="text-sm font-medium text-foreground">{value}</p>
           </div>
         </div>
       ))}

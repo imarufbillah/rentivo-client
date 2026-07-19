@@ -15,13 +15,13 @@ const ProfilePage = () => {
     <ProtectedRoute>
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold">Profile</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <h1 className="font-display text-2xl font-bold">Profile</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Manage your account settings
           </p>
         </div>
 
-        <div className="rounded-xl border p-6">
+        <div className="rounded-2xl border bg-card p-6">
           <ProfileForm
             userName={user?.name}
             userAvatar={user?.image}

@@ -54,8 +54,10 @@ export const PricingSection = ({ property }: PricingSectionProps) => {
   }
 
   return (
-    <div className="rounded-xl border p-4">
-      <h3 className="mb-3 font-semibold">Pricing & Terms</h3>
+    <div className="rounded-2xl border bg-card p-5">
+      <h3 className="mb-3 font-display text-sm font-bold">
+        Pricing & Terms
+      </h3>
       <div className="space-y-3">
         {items.map(({ icon: Icon, label, value, highlight }) => (
           <div key={label} className="flex items-center justify-between">
@@ -63,9 +65,17 @@ export const PricingSection = ({ property }: PricingSectionProps) => {
               <Icon className="h-4 w-4" />
               {label}
             </div>
-            <span className={`text-sm font-medium ${highlight ? "text-lg text-primary" : ""}`}>
+            <span
+              className={`text-sm font-medium ${
+                highlight ? "text-lg font-bold text-primary" : ""
+              }`}
+            >
               {value}
-              {highlight && <span className="text-sm font-normal text-muted-foreground">/mo</span>}
+              {highlight && (
+                <span className="text-sm font-normal text-muted-foreground">
+                  /mo
+                </span>
+              )}
             </span>
           </div>
         ))}

@@ -5,22 +5,50 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Property, PropertyStatus, FurnishingStatus, PropertyCondition, ParkingStatus, PetPolicy, SmokingPolicy, RentFrequency } from "@/../../rentivo-server/src/types";
+import {
+  Property,
+  PropertyStatus,
+  FurnishingStatus,
+  PropertyCondition,
+  ParkingStatus,
+  PetPolicy,
+  SmokingPolicy,
+  RentFrequency,
+} from "@/../../rentivo-server/src/types";
 import { ImageManager } from "./ImageManager";
 import { useAmenities } from "@/hooks/useProperties";
+import { Loader2 } from "lucide-react";
 
 const propertyFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
-  shortDescription: z.string().max(200, "Short description must be 200 characters or less").optional(),
+  shortDescription: z
+    .string()
+    .max(200, "Short description must be 200 characters or less")
+    .optional(),
   description: z.string().min(20, "Description must be at least 20 characters"),
-  price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Price must be positive"),
+  price: z.string().refine(
+    (val) => !isNaN(Number(val)) && Number(val) > 0,
+    "Price must be positive"
+  ),
   location: z.string().min(2, "Location is required"),
   propertyType: z.enum(["apartment", "house", "room", "studio", "villa"]),
   status: z.enum(["active", "pending", "archived", "rented"]),
-  images: z.array(z.string().url()).min(1, "At least one image is required").max(6, "Maximum 6 images allowed"),
-  bedrooms: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, "Bedrooms must be 0 or more"),
-  bathrooms: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, "Bathrooms must be 0 or more"),
+  images: z
+    .array(z.string().url())
+    .min(1, "At least one image is required")
+    .max(6, "Maximum 6 images allowed"),
+  bedrooms: z
+    .string()
+    .refine(
+      (val) => !isNaN(Number(val)) && Number(val) >= 0,
+      "Bedrooms must be 0 or more"
+    ),
+  bathrooms: z
+    .string()
+    .refine(
+      (val) => !isNaN(Number(val)) && Number(val) >= 0,
+      "Bathrooms must be 0 or more"
+    ),
   size: z.string().optional(),
   balconies: z.string().optional(),
   floor: z.string().optional(),
@@ -47,12 +75,19 @@ type PropertyFormData = z.infer<typeof propertyFormSchema>;
 
 interface PropertyFormProps {
   initialData?: Property;
-  onSubmit: (data: Omit<Property, "_id" | "ownerId" | "createdAt" | "updatedAt">) => void;
+  onSubmit: (
+    data: Omit<Property, "_id" | "ownerId" | "createdAt" | "updatedAt">
+  ) => void;
   isLoading?: boolean;
 }
 
 const propertyTypes = ["apartment", "house", "room", "studio", "villa"] as const;
-const propertyStatuses: readonly PropertyStatus[] = ["active", "pending", "archived", "rented"];
+const propertyStatuses: readonly PropertyStatus[] = [
+  "active",
+  "pending",
+  "archived",
+  "rented",
+];
 const furnishingOptions: { value: FurnishingStatus; label: string }[] = [
   { value: "furnished", label: "Furnished" },
   { value: "semi-furnished", label: "Semi-Furnished" },
@@ -84,13 +119,26 @@ const rentFrequencyOptions: { value: RentFrequency; label: string }[] = [
   { value: "daily", label: "Daily" },
 ];
 
+const inputClass =
+  "w-full rounded-xl border bg-card py-2.5 px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20";
+
 const SectionHeading = ({ children }: { children: React.ReactNode }) => (
-  <h3 className="text-lg font-semibold border-b pb-2 mt-6 mb-4">{children}</h3>
+  <h3 className="mt-6 mb-4 border-b pb-2 font-display text-sm font-bold text-foreground">
+    {children}
+  </h3>
 );
 
-export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormProps) => {
-  const [images, setImages] = useState<string[]>(initialData?.images || []);
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>(initialData?.amenities || []);
+export const PropertyForm = ({
+  initialData,
+  onSubmit,
+  isLoading,
+}: PropertyFormProps) => {
+  const [images, setImages] = useState<string[]>(
+    initialData?.images || []
+  );
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>(
+    initialData?.amenities || []
+  );
   const { data: amenitiesData } = useAmenities();
   const amenitiesList = (amenitiesData?.amenities || []).map((a) => ({
     value: a,
@@ -150,7 +198,9 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
 
   const toggleAmenity = (amenity: string) => {
     setSelectedAmenities((prev) =>
-      prev.includes(amenity) ? prev.filter((a) => a !== amenity) : [...prev, amenity]
+      prev.includes(amenity)
+        ? prev.filter((a) => a !== amenity)
+        : [...prev, amenity]
     );
   };
 
@@ -164,82 +214,137 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
       balconies: data.balconies ? Number(data.balconies) : undefined,
       floor: data.floor ? Number(data.floor) : undefined,
       totalFloors: data.totalFloors ? Number(data.totalFloors) : undefined,
-      securityDeposit: data.securityDeposit ? Number(data.securityDeposit) : undefined,
-      advancePayment: data.advancePayment ? Number(data.advancePayment) : undefined,
-      leaseDuration: data.leaseDuration ? Number(data.leaseDuration) : undefined,
+      securityDeposit: data.securityDeposit
+        ? Number(data.securityDeposit)
+        : undefined,
+      advancePayment: data.advancePayment
+        ? Number(data.advancePayment)
+        : undefined,
+      leaseDuration: data.leaseDuration
+        ? Number(data.leaseDuration)
+        : undefined,
       minStay: data.minStay ? Number(data.minStay) : undefined,
       utilities: data.utilities
-        ? data.utilities.split(",").map((u) => u.trim()).filter(Boolean)
+        ? data.utilities
+            .split(",")
+            .map((u) => u.trim())
+            .filter(Boolean)
         : undefined,
-      availableFrom: data.availableFrom ? new Date(data.availableFrom) : undefined,
+      availableFrom: data.availableFrom
+        ? new Date(data.availableFrom)
+        : undefined,
       amenities: selectedAmenities,
       images,
     });
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6 max-w-2xl" noValidate>
+    <form
+      onSubmit={handleSubmit(onFormSubmit)}
+      className="max-w-2xl space-y-6"
+      noValidate
+    >
       <SectionHeading>Basic Information</SectionHeading>
 
-      <div>
-        <label htmlFor="title" className="block text-sm font-medium mb-1.5">Title</label>
-        <Input
+      <div className="space-y-2">
+        <label htmlFor="title" className="text-sm font-medium text-foreground">
+          Title
+        </label>
+        <input
           id="title"
           {...register("title")}
           placeholder="Cozy apartment downtown"
+          className={inputClass}
           aria-invalid={!!errors.title}
           aria-describedby={errors.title ? "title-error" : undefined}
         />
-        {errors.title && <p id="title-error" role="alert" className="mt-1 text-sm text-destructive">{errors.title.message}</p>}
+        {errors.title && (
+          <p id="title-error" role="alert" className="text-sm text-destructive">
+            {errors.title.message}
+          </p>
+        )}
       </div>
 
-      <div>
-        <label htmlFor="shortDescription" className="block text-sm font-medium mb-1.5">Short Description</label>
-        <Input
+      <div className="space-y-2">
+        <label
+          htmlFor="shortDescription"
+          className="text-sm font-medium text-foreground"
+        >
+          Short Description
+        </label>
+        <input
           id="shortDescription"
           {...register("shortDescription")}
           placeholder="Brief one-liner about your property"
           maxLength={200}
+          className={inputClass}
         />
-        {errors.shortDescription && <p role="alert" className="mt-1 text-sm text-destructive">{errors.shortDescription.message}</p>}
+        {errors.shortDescription && (
+          <p role="alert" className="text-sm text-destructive">
+            {errors.shortDescription.message}
+          </p>
+        )}
       </div>
 
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium mb-1.5">Description</label>
+      <div className="space-y-2">
+        <label
+          htmlFor="description"
+          className="text-sm font-medium text-foreground"
+        >
+          Description
+        </label>
         <textarea
           id="description"
           {...register("description")}
           rows={4}
-          className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className={inputClass}
           placeholder="Describe your property in detail..."
           aria-invalid={!!errors.description}
           aria-describedby={errors.description ? "description-error" : undefined}
         />
-        {errors.description && <p id="description-error" role="alert" className="mt-1 text-sm text-destructive">{errors.description.message}</p>}
+        {errors.description && (
+          <p
+            id="description-error"
+            role="alert"
+            className="text-sm text-destructive"
+          >
+            {errors.description.message}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="propertyType" className="block text-sm font-medium mb-1.5">Property Type</label>
+        <div className="space-y-2">
+          <label
+            htmlFor="propertyType"
+            className="text-sm font-medium text-foreground"
+          >
+            Property Type
+          </label>
           <select
             id="propertyType"
             {...register("propertyType")}
-            className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className={inputClass}
           >
             {propertyTypes.map((type) => (
-              <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+              <option key={type} value={type}>
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </option>
             ))}
           </select>
         </div>
-        <div>
-          <label htmlFor="status" className="block text-sm font-medium mb-1.5">Status</label>
-          <select
-            id="status"
-            {...register("status")}
-            className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        <div className="space-y-2">
+          <label
+            htmlFor="status"
+            className="text-sm font-medium text-foreground"
           >
+            Status
+          </label>
+          <select id="status" {...register("status")} className={inputClass}>
             {propertyStatuses.map((s) => (
-              <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+              <option key={s} value={s}>
+                {s.charAt(0).toUpperCase() + s.slice(1)}
+              </option>
             ))}
           </select>
         </div>
@@ -248,22 +353,38 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
       <SectionHeading>Location</SectionHeading>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="location" className="block text-sm font-medium mb-1.5">Location</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="location"
+            className="text-sm font-medium text-foreground"
+          >
+            Location
+          </label>
+          <input
             id="location"
             {...register("location")}
             placeholder="New York"
+            className={inputClass}
             aria-invalid={!!errors.location}
           />
-          {errors.location && <p role="alert" className="mt-1 text-sm text-destructive">{errors.location.message}</p>}
+          {errors.location && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.location.message}
+            </p>
+          )}
         </div>
-        <div>
-          <label htmlFor="fullAddress" className="block text-sm font-medium mb-1.5">Full Address</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="fullAddress"
+            className="text-sm font-medium text-foreground"
+          >
+            Full Address
+          </label>
+          <input
             id="fullAddress"
             {...register("fullAddress")}
             placeholder="123 Main St, Apt 4B"
+            className={inputClass}
           />
         </div>
       </div>
@@ -271,49 +392,78 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
       <SectionHeading>Pricing</SectionHeading>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="price" className="block text-sm font-medium mb-1.5">Price ($)</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="price"
+            className="text-sm font-medium text-foreground"
+          >
+            Price ($)
+          </label>
+          <input
             id="price"
             type="number"
             {...register("price")}
             placeholder="1500"
+            className={inputClass}
             aria-invalid={!!errors.price}
           />
-          {errors.price && <p role="alert" className="mt-1 text-sm text-destructive">{errors.price.message}</p>}
+          {errors.price && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.price.message}
+            </p>
+          )}
         </div>
-        <div>
-          <label htmlFor="rentFrequency" className="block text-sm font-medium mb-1.5">Rent Frequency</label>
+        <div className="space-y-2">
+          <label
+            htmlFor="rentFrequency"
+            className="text-sm font-medium text-foreground"
+          >
+            Rent Frequency
+          </label>
           <select
             id="rentFrequency"
             {...register("rentFrequency")}
-            className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className={inputClass}
           >
             <option value="">Select...</option>
             {rentFrequencyOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
             ))}
           </select>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="securityDeposit" className="block text-sm font-medium mb-1.5">Security Deposit ($)</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="securityDeposit"
+            className="text-sm font-medium text-foreground"
+          >
+            Security Deposit ($)
+          </label>
+          <input
             id="securityDeposit"
             type="number"
             {...register("securityDeposit")}
             placeholder="0"
+            className={inputClass}
           />
         </div>
-        <div>
-          <label htmlFor="advancePayment" className="block text-sm font-medium mb-1.5">Advance Payment ($)</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="advancePayment"
+            className="text-sm font-medium text-foreground"
+          >
+            Advance Payment ($)
+          </label>
+          <input
             id="advancePayment"
             type="number"
             {...register("advancePayment")}
             placeholder="0"
+            className={inputClass}
           />
         </div>
       </div>
@@ -321,63 +471,107 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
       <SectionHeading>Property Details</SectionHeading>
 
       <div className="grid grid-cols-4 gap-4">
-        <div>
-          <label htmlFor="bedrooms" className="block text-sm font-medium mb-1.5">Bedrooms</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="bedrooms"
+            className="text-sm font-medium text-foreground"
+          >
+            Bedrooms
+          </label>
+          <input
             id="bedrooms"
             type="number"
             {...register("bedrooms")}
             min="0"
+            className={inputClass}
           />
-          {errors.bedrooms && <p role="alert" className="mt-1 text-sm text-destructive">{errors.bedrooms.message}</p>}
+          {errors.bedrooms && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.bedrooms.message}
+            </p>
+          )}
         </div>
-        <div>
-          <label htmlFor="bathrooms" className="block text-sm font-medium mb-1.5">Bathrooms</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="bathrooms"
+            className="text-sm font-medium text-foreground"
+          >
+            Bathrooms
+          </label>
+          <input
             id="bathrooms"
             type="number"
             {...register("bathrooms")}
             min="0"
+            className={inputClass}
           />
-          {errors.bathrooms && <p role="alert" className="mt-1 text-sm text-destructive">{errors.bathrooms.message}</p>}
+          {errors.bathrooms && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.bathrooms.message}
+            </p>
+          )}
         </div>
-        <div>
-          <label htmlFor="size" className="block text-sm font-medium mb-1.5">Size (sqft)</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="size"
+            className="text-sm font-medium text-foreground"
+          >
+            Size (sqft)
+          </label>
+          <input
             id="size"
             type="number"
             {...register("size")}
             placeholder="0"
+            className={inputClass}
           />
         </div>
-        <div>
-          <label htmlFor="balconies" className="block text-sm font-medium mb-1.5">Balconies</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="balconies"
+            className="text-sm font-medium text-foreground"
+          >
+            Balconies
+          </label>
+          <input
             id="balconies"
             type="number"
             {...register("balconies")}
             placeholder="0"
+            className={inputClass}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="floor" className="block text-sm font-medium mb-1.5">Floor</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="floor"
+            className="text-sm font-medium text-foreground"
+          >
+            Floor
+          </label>
+          <input
             id="floor"
             type="number"
             {...register("floor")}
             placeholder="0"
+            className={inputClass}
           />
         </div>
-        <div>
-          <label htmlFor="totalFloors" className="block text-sm font-medium mb-1.5">Total Floors</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="totalFloors"
+            className="text-sm font-medium text-foreground"
+          >
+            Total Floors
+          </label>
+          <input
             id="totalFloors"
             type="number"
             {...register("totalFloors")}
             placeholder="0"
+            className={inputClass}
           />
         </div>
       </div>
@@ -385,29 +579,43 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
       <SectionHeading>Condition & Furnishing</SectionHeading>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="furnishing" className="block text-sm font-medium mb-1.5">Furnishing</label>
+        <div className="space-y-2">
+          <label
+            htmlFor="furnishing"
+            className="text-sm font-medium text-foreground"
+          >
+            Furnishing
+          </label>
           <select
             id="furnishing"
             {...register("furnishing")}
-            className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className={inputClass}
           >
             <option value="">Select...</option>
             {furnishingOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
             ))}
           </select>
         </div>
-        <div>
-          <label htmlFor="condition" className="block text-sm font-medium mb-1.5">Condition</label>
+        <div className="space-y-2">
+          <label
+            htmlFor="condition"
+            className="text-sm font-medium text-foreground"
+          >
+            Condition
+          </label>
           <select
             id="condition"
             {...register("condition")}
-            className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className={inputClass}
           >
             <option value="">Select...</option>
             {conditionOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
             ))}
           </select>
         </div>
@@ -416,16 +624,23 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
       <SectionHeading>Parking & Internet</SectionHeading>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="parking" className="block text-sm font-medium mb-1.5">Parking</label>
+        <div className="space-y-2">
+          <label
+            htmlFor="parking"
+            className="text-sm font-medium text-foreground"
+          >
+            Parking
+          </label>
           <select
             id="parking"
             {...register("parking")}
-            className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className={inputClass}
           >
             <option value="">Select...</option>
             {parkingOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
             ))}
           </select>
         </div>
@@ -435,39 +650,62 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
             type="checkbox"
             {...register("internet")}
             checked={internetChecked}
-            className="h-4 w-4 rounded border-input"
+            className="rounded"
           />
-          <label htmlFor="internet" className="text-sm font-medium">Internet Included</label>
+          <label
+            htmlFor="internet"
+            className="text-sm font-medium text-foreground"
+          >
+            Internet Included
+          </label>
         </div>
       </div>
 
       <SectionHeading>Lease Terms</SectionHeading>
 
       <div className="grid grid-cols-3 gap-4">
-        <div>
-          <label htmlFor="leaseDuration" className="block text-sm font-medium mb-1.5">Lease Duration (months)</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="leaseDuration"
+            className="text-sm font-medium text-foreground"
+          >
+            Lease Duration (months)
+          </label>
+          <input
             id="leaseDuration"
             type="number"
             {...register("leaseDuration")}
             placeholder="12"
+            className={inputClass}
           />
         </div>
-        <div>
-          <label htmlFor="minStay" className="block text-sm font-medium mb-1.5">Min Stay (months)</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="minStay"
+            className="text-sm font-medium text-foreground"
+          >
+            Min Stay (months)
+          </label>
+          <input
             id="minStay"
             type="number"
             {...register("minStay")}
             placeholder="1"
+            className={inputClass}
           />
         </div>
-        <div>
-          <label htmlFor="availableFrom" className="block text-sm font-medium mb-1.5">Available From</label>
-          <Input
+        <div className="space-y-2">
+          <label
+            htmlFor="availableFrom"
+            className="text-sm font-medium text-foreground"
+          >
+            Available From
+          </label>
+          <input
             id="availableFrom"
             type="date"
             {...register("availableFrom")}
+            className={inputClass}
           />
         </div>
       </div>
@@ -475,29 +713,43 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
       <SectionHeading>Policies</SectionHeading>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="petPolicy" className="block text-sm font-medium mb-1.5">Pet Policy</label>
+        <div className="space-y-2">
+          <label
+            htmlFor="petPolicy"
+            className="text-sm font-medium text-foreground"
+          >
+            Pet Policy
+          </label>
           <select
             id="petPolicy"
             {...register("petPolicy")}
-            className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className={inputClass}
           >
             <option value="">Select...</option>
             {petPolicyOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
             ))}
           </select>
         </div>
-        <div>
-          <label htmlFor="smokingPolicy" className="block text-sm font-medium mb-1.5">Smoking Policy</label>
+        <div className="space-y-2">
+          <label
+            htmlFor="smokingPolicy"
+            className="text-sm font-medium text-foreground"
+          >
+            Smoking Policy
+          </label>
           <select
             id="smokingPolicy"
             {...register("smokingPolicy")}
-            className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className={inputClass}
           >
             <option value="">Select...</option>
             {smokingPolicyOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
             ))}
           </select>
         </div>
@@ -516,7 +768,7 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
               className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                 selected
                   ? "border-primary bg-primary text-primary-foreground"
-                  : "border-input hover:bg-muted"
+                  : "border-border text-muted-foreground hover:bg-muted"
               }`}
             >
               {amenity.label}
@@ -527,37 +779,53 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
 
       <SectionHeading>Utilities</SectionHeading>
 
-      <div>
-        <label htmlFor="utilities" className="block text-sm font-medium mb-1.5">Utilities (comma-separated)</label>
-        <Input
+      <div className="space-y-2">
+        <label
+          htmlFor="utilities"
+          className="text-sm font-medium text-foreground"
+        >
+          Utilities (comma-separated)
+        </label>
+        <input
           id="utilities"
           {...register("utilities")}
           placeholder="water, electricity, gas, internet"
+          className={inputClass}
         />
       </div>
 
       <SectionHeading>House Rules</SectionHeading>
 
-      <div>
-        <label htmlFor="houseRules" className="block text-sm font-medium mb-1.5">House Rules</label>
+      <div className="space-y-2">
+        <label
+          htmlFor="houseRules"
+          className="text-sm font-medium text-foreground"
+        >
+          House Rules
+        </label>
         <textarea
           id="houseRules"
           {...register("houseRules")}
           rows={3}
-          className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className={inputClass}
           placeholder="No smoking, quiet hours after 10pm..."
         />
       </div>
 
       <SectionHeading>Rental Terms</SectionHeading>
 
-      <div>
-        <label htmlFor="rentalTerms" className="block text-sm font-medium mb-1.5">Rental Terms</label>
+      <div className="space-y-2">
+        <label
+          htmlFor="rentalTerms"
+          className="text-sm font-medium text-foreground"
+        >
+          Rental Terms
+        </label>
         <textarea
           id="rentalTerms"
           {...register("rentalTerms")}
           rows={3}
-          className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className={inputClass}
           placeholder="Payment due on the 1st, late fee applies..."
         />
       </div>
@@ -566,11 +834,27 @@ export const PropertyForm = ({ initialData, onSubmit, isLoading }: PropertyFormP
 
       <div>
         <ImageManager images={images} onChange={handleImagesChange} />
-        {errors.images && <p className="mt-1 text-sm text-destructive">{errors.images.message}</p>}
+        {errors.images && (
+          <p className="mt-1 text-sm text-destructive">
+            {errors.images.message}
+          </p>
+        )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Saving..." : initialData ? "Update Property" : "Create Property"}
+      <Button
+        type="submit"
+        className="w-full rounded-full"
+        size="lg"
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : null}
+        {isLoading
+          ? "Saving..."
+          : initialData
+            ? "Update Property"
+            : "Create Property"}
       </Button>
     </form>
   );

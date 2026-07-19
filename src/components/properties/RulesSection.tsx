@@ -14,8 +14,10 @@ export const RulesSection = ({ property }: RulesSectionProps) => {
   if (!hasRules && !hasTerms) return null;
 
   return (
-    <div className="rounded-xl border p-4">
-      <h3 className="mb-3 font-semibold">Rules & Terms</h3>
+    <div className="rounded-2xl border bg-card p-5">
+      <h3 className="mb-3 font-display text-sm font-bold">
+        Rules & Terms
+      </h3>
       <div className="space-y-4">
         {hasRules && (
           <div className="space-y-2">
@@ -23,7 +25,9 @@ export const RulesSection = ({ property }: RulesSectionProps) => {
               <ShieldCheck className="h-4 w-4" />
               House Rules
             </div>
-            <p className="whitespace-pre-line text-sm leading-relaxed">{property.houseRules}</p>
+            <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+              {property.houseRules}
+            </p>
           </div>
         )}
         {hasTerms && (
@@ -32,7 +36,9 @@ export const RulesSection = ({ property }: RulesSectionProps) => {
               <FileText className="h-4 w-4" />
               Rental Terms
             </div>
-            <p className="whitespace-pre-line text-sm leading-relaxed">{property.rentalTerms}</p>
+            <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+              {property.rentalTerms}
+            </p>
           </div>
         )}
       </div>

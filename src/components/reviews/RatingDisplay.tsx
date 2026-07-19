@@ -7,7 +7,7 @@ interface RatingDisplayProps {
   showValue?: boolean;
 }
 
-const Star = ({ fill }: { fill: "full" | "half" | "empty" }) => (
+const StarIcon = ({ fill }: { fill: "full" | "half" | "empty" }) => (
   <svg className="inline-block" viewBox="0 0 24 24" fill="none">
     <defs>
       <linearGradient id="halfStar">
@@ -21,8 +21,8 @@ const Star = ({ fill }: { fill: "full" | "half" | "empty" }) => (
         fill === "full"
           ? "currentColor"
           : fill === "half"
-          ? "url(#halfStar)"
-          : "none"
+            ? "url(#halfStar)"
+            : "none"
       }
       stroke="currentColor"
       strokeWidth="1"
@@ -46,10 +46,10 @@ export const RatingDisplay = ({
   });
 
   return (
-    <span className="inline-flex items-center gap-0.5 text-warning">
+    <span className="inline-flex items-center gap-0.5 text-amber-400">
       {stars.map((fill, i) => (
         <span key={i} className={sizeClasses[size]}>
-          <Star fill={fill} />
+          <StarIcon fill={fill} />
         </span>
       ))}
       {showValue && (

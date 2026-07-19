@@ -18,7 +18,11 @@ export const RentButton = ({ property, isOwner }: RentButtonProps) => {
 
   if (property.status === "rented") {
     return (
-      <Button disabled variant="outline" className="w-full">
+      <Button
+        disabled
+        variant="outline"
+        className="w-full rounded-full opacity-60"
+      >
         <Home className="mr-2 h-4 w-4" />
         Currently Rented
       </Button>
@@ -27,7 +31,11 @@ export const RentButton = ({ property, isOwner }: RentButtonProps) => {
 
   return (
     <>
-      <Button onClick={() => setShowDialog(true)} className="w-full" size="lg">
+      <Button
+        onClick={() => setShowDialog(true)}
+        className="w-full rounded-full"
+        size="lg"
+      >
         <Home className="mr-2 h-4 w-4" />
         Rent This Property
       </Button>

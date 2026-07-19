@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { RecommendationCard } from "./RecommendationCard";
-import { PropertyFilters, FilterState } from "@/components/properties/PropertyFilters";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  PropertyFilters,
+  FilterState,
+} from "@/components/properties/PropertyFilters";
 import { Button } from "@/components/ui/button";
 import { useRecommendations } from "@/hooks/useRecommendations";
 import { getErrorMessage, isLLMServiceError } from "@/lib/api/error";
+import { AlertTriangle, Sparkles, SearchX } from "lucide-react";
 
 export const RecommendationFeed = () => {
   const [filters, setFilters] = useState<FilterState>({
@@ -38,7 +41,7 @@ export const RecommendationFeed = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">
+        <h2 className="font-display text-2xl font-bold">
           {isPersonalized ? "Recommended for You" : "Popular Properties"}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -53,22 +56,25 @@ export const RecommendationFeed = () => {
       {isLoading ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-[440px] overflow-hidden rounded-xl border-2 border-primary/20 bg-card shadow-sm">
-              <Skeleton className="h-48 w-full rounded-none" />
+            <div
+              key={i}
+              className="overflow-hidden rounded-2xl border bg-card"
+            >
+              <div className="h-48 animate-pulse bg-muted" />
               <div className="flex flex-col gap-2 p-4">
-                <Skeleton className="h-5 w-2/3" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-3 w-full" />
+                <div className="h-5 w-2/3 animate-pulse rounded bg-muted" />
+                <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
+                <div className="h-3 w-full animate-pulse rounded bg-muted" />
               </div>
             </div>
           ))}
         </div>
       ) : error ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-destructive/20 bg-destructive/5 py-12 text-center">
-          <div className="mb-4 text-4xl">
-            {isLLMServiceError(error) ? "🤖" : "⚠️"}
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/5 py-12 text-center">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+            <AlertTriangle className="h-8 w-8" />
           </div>
-          <h3 className="text-lg font-semibold">
+          <h3 className="font-display text-lg font-bold">
             {isLLMServiceError(error)
               ? "AI Recommendations Unavailable"
               : "Failed to Load Recommendations"}
@@ -78,14 +84,22 @@ export const RecommendationFeed = () => {
               ? "The AI recommendation service is temporarily down. Showing popular properties instead."
               : getErrorMessage(error)}
           </p>
-          <Button onClick={() => refetch()} variant="outline" className="mt-4">
+          <Button
+            onClick={() => refetch()}
+            variant="outline"
+            className="mt-4 rounded-full"
+          >
             Try Again
           </Button>
         </div>
       ) : recommendations.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border py-12 text-center">
-          <div className="mb-4 text-4xl text-muted-foreground">🔍</div>
-          <h3 className="text-lg font-semibold">No recommendations yet</h3>
+        <div className="flex flex-col items-center justify-center rounded-2xl border bg-card py-12 text-center">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
+            <SearchX className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <h3 className="font-display text-lg font-bold">
+            No recommendations yet
+          </h3>
           <p className="mt-1 text-sm text-muted-foreground">
             {isPersonalized
               ? "Try adjusting your filters to find more properties"
