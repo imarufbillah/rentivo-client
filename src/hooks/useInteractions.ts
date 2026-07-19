@@ -21,6 +21,12 @@ interface InteractionHistoryResponse {
   };
 }
 
+export interface InteractionState {
+  hasViewed: boolean;
+  hasSaved: boolean;
+  hasDismissed: boolean;
+}
+
 export const useTrackInteraction = () => {
   const queryClient = useQueryClient();
 
@@ -28,11 +34,20 @@ export const useTrackInteraction = () => {
     mutationFn: (data: { propertyId: string; type: 'view' | 'save' | 'dismiss' }) =>
       apiClient.post('/api/interactions', data),
     onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['interactions', 'state', variables.propertyId] });
       if (variables.type === 'save' || variables.type === 'dismiss') {
         queryClient.invalidateQueries({ queryKey: ['recommendations'] });
       }
       queryClient.invalidateQueries({ queryKey: ['interactions'] });
     },
+  });
+};
+
+export const useInteractionState = (propertyId: string) => {
+  return useQuery({
+    queryKey: ['interactions', 'state', propertyId],
+    queryFn: () => apiClient.get<InteractionState>(`/api/interactions/property/${propertyId}`),
+    enabled: !!propertyId,
   });
 };
 

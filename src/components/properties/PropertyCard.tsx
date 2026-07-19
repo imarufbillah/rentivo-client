@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { useTrackInteraction } from "@/hooks/useInteractions";
+import { useTrackInteraction, useInteractionState } from "@/hooks/useInteractions";
 import { useSession } from "@/hooks/useAuth";
 
 interface PropertyCardProps {
@@ -27,7 +27,20 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
   const { data: session } = useSession();
   const trackInteraction = useTrackInteraction();
   const propertyId = property._id?.toString() || "";
+  const { data: interactionStateData } = useInteractionState(propertyId);
   const [interactionState, setInteractionState] = useState<"idle" | "saved" | "dismissed">("idle");
+
+  useEffect(() => {
+    if (interactionStateData) {
+      if (interactionStateData.hasSaved) {
+        setInteractionState("saved");
+      } else if (interactionStateData.hasDismissed) {
+        setInteractionState("dismissed");
+      } else {
+        setInteractionState("idle");
+      }
+    }
+  }, [interactionStateData]);
 
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();

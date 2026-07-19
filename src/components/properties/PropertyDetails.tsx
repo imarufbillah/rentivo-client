@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PropertyCard } from "./PropertyCard";
-import { useTrackInteraction } from "@/hooks/useInteractions";
+import { useTrackInteraction, useInteractionState } from "@/hooks/useInteractions";
 import { useSession } from "@/hooks/useAuth";
 import { useReviews } from "@/hooks/useReviews";
 import { Property } from "@/../../rentivo-server/src/types";
@@ -21,7 +21,21 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
   const trackInteraction = useTrackInteraction();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { data: reviewData } = useReviews(property._id?.toString() || "");
+  const propertyId = property._id?.toString() || "";
+  const { data: interactionStateData } = useInteractionState(propertyId);
   const [interactionState, setInteractionState] = useState<"idle" | "saved" | "dismissed">("idle");
+
+  useEffect(() => {
+    if (interactionStateData) {
+      if (interactionStateData.hasSaved) {
+        setInteractionState("saved");
+      } else if (interactionStateData.hasDismissed) {
+        setInteractionState("dismissed");
+      } else {
+        setInteractionState("idle");
+      }
+    }
+  }, [interactionStateData]);
 
   useEffect(() => {
     if (session && property._id) {
