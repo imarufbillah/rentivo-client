@@ -52,6 +52,9 @@ export const ListingMeta = ({ property }: ListingMetaProps) => {
           )}
         </div>
         <h1 className="mt-3 text-2xl font-bold">{property.title}</h1>
+        {property.shortDescription && (
+          <p className="mt-2 text-muted-foreground">{property.shortDescription}</p>
+        )}
         <div className="mt-1 flex items-center gap-1 text-muted-foreground">
           <MapPin className="h-4 w-4" />
           {property.fullAddress || property.location}
