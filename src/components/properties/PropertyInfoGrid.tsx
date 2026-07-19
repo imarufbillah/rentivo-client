@@ -1,6 +1,6 @@
 "use client";
 
-import { Property } from "@/../../rentivo-server/src/types";
+import { Property } from "@/types";
 import { Bed, Bath, Ruler, Building, Layers, Car } from "lucide-react";
 
 interface PropertyInfoGridProps {

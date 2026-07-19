@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Property } from "@/../../rentivo-server/src/types";
+import { Property } from "@/types";
 import { MapPin, Bed, Bath, Sparkles } from "lucide-react";
 
 interface RecommendationCardProps {

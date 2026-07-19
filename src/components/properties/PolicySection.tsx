@@ -1,6 +1,6 @@
 "use client";
 
-import { Property } from "@/../../rentivo-server/src/types";
+import { Property } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Dog, Cigarette, Sofa, Sparkles } from "lucide-react";
 

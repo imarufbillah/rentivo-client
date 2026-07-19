@@ -1,6 +1,6 @@
 "use client";
 
-import { Property } from "@/../../rentivo-server/src/types";
+import { Property } from "@/types";
 import { MapPin, CalendarDays, Wifi, Droplets, Zap, Flame } from "lucide-react";
 
 interface ListingMetaProps {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Property } from "@/../../rentivo-server/src/types";
+import { Property } from "@/types";
 import { RentConfirmationDialog } from "./RentConfirmationDialog";
 import { Home } from "lucide-react";
 

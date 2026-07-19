@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
-import { RecommendedProperty } from '@/../../rentivo-server/src/types';
+import { RecommendedProperty } from '@/types';
 
 interface RecommendationResponse {
   recommendations: RecommendedProperty[];

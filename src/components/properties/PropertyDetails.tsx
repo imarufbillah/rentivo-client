@@ -20,7 +20,7 @@ import {
 } from "@/hooks/useInteractions";
 import { usePropertyRentalStatus } from "@/hooks/useRentals";
 import { useSession } from "@/hooks/useAuth";
-import { Property } from "@/../../rentivo-server/src/types";
+import { Property } from "@/types";
 import { PropertyOwner } from "@/hooks/useProperties";
 import { Heart } from "lucide-react";
 

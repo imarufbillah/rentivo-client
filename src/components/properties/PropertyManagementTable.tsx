@@ -7,7 +7,7 @@ import {
   useMyProperties,
   useDeleteProperty,
 } from "@/hooks/useProperties";
-import { PropertyWithStats } from "@/../../rentivo-server/src/types";
+import { PropertyWithStats } from "@/types";
 import { Eye, Heart, Star, Trash2 } from "lucide-react";
 
 const statusColors: Record<string, string> = {

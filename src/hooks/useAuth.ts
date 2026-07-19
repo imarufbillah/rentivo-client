@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
 import { authClient } from '@/lib/auth-client';
-import { User } from '@/../../rentivo-server/src/types';
+import { User } from '@/types';
 
 export const useSession = () => {
   return useQuery({

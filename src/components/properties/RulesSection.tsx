@@ -1,6 +1,6 @@
 "use client";
 
-import { Property } from "@/../../rentivo-server/src/types";
+import { Property } from "@/types";
 import { ShieldCheck, FileText } from "lucide-react";
 
 interface RulesSectionProps {

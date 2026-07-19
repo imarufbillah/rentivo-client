@@ -14,7 +14,7 @@ import {
   PetPolicy,
   SmokingPolicy,
   RentFrequency,
-} from "@/../../rentivo-server/src/types";
+} from "@/types";
 import { ImageManager } from "./ImageManager";
 import { useAmenities } from "@/hooks/useProperties";
 import { Loader2 } from "lucide-react";

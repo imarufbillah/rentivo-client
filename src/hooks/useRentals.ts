@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
-import { Rental, RentalWithProperty } from '@/../../rentivo-server/src/types';
+import { Rental, RentalWithProperty } from '@/types';
 
 interface CheckoutResult {
   checkoutUrl: string;

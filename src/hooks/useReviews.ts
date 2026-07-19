@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
-import { Review } from '@/../../rentivo-server/src/types';
+import { Review } from '@/types';
 
 interface ReviewResponse {
   reviews: Review[];

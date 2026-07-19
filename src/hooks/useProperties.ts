@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
-import { Property, PropertyWithStats, PaginatedResult, PropertyFilters } from '@/../../rentivo-server/src/types';
+import { Property, PropertyWithStats, PaginatedResult, PropertyFilters } from '@/types';
 
 interface PropertyFiltersParams {
   search?: string;
