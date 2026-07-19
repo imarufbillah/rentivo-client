@@ -29,20 +29,27 @@ const propertyTypes = ["", "apartment", "house", "room", "studio", "villa"];
 
 const amenitiesList = [
   { value: "wifi", label: "WiFi" },
+  { value: "kitchen", label: "Kitchen" },
   { value: "parking", label: "Parking" },
   { value: "pool", label: "Pool" },
   { value: "gym", label: "Gym" },
   { value: "laundry", label: "Laundry" },
+  { value: "washer/dryer", label: "Washer/Dryer" },
   { value: "ac", label: "AC" },
   { value: "pets", label: "Pets Allowed" },
   { value: "doorman", label: "Doorman" },
   { value: "elevator", label: "Elevator" },
   { value: "balcony", label: "Balcony" },
+  { value: "patio", label: "Patio" },
+  { value: "garden", label: "Garden" },
+  { value: "garage", label: "Garage" },
   { value: "dishwasher", label: "Dishwasher" },
   { value: "hardwood", label: "Hardwood" },
   { value: "fireplace", label: "Fireplace" },
   { value: "storage", label: "Storage" },
   { value: "bike", label: "Bike Storage" },
+  { value: "furnished", label: "Furnished" },
+  { value: "views", label: "Views" },
 ];
 
 export const PropertyFilters = ({ onFilterChange, initialFilters }: PropertyFiltersProps) => {
