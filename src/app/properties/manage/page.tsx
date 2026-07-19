@@ -7,6 +7,7 @@ import { RoleGuard } from "@/components/auth/RoleGuard";
 import { PropertyManagementTable } from "@/components/properties/PropertyManagementTable";
 import { useMyProperties } from "@/hooks/useProperties";
 import { Eye, Heart, Star, Home } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 const SummaryCards = () => {
   const { data } = useMyProperties();
@@ -49,6 +50,35 @@ const SummaryCards = () => {
   );
 };
 
+const PropertyChart = () => {
+  const { data } = useMyProperties();
+  const properties = data?.properties || [];
+
+  if (properties.length === 0) return null;
+
+  const chartData = properties.map((p) => ({
+    name: p.title.length > 15 ? p.title.slice(0, 15) + "..." : p.title,
+    views: p.viewCount,
+    saves: p.saveCount,
+  }));
+
+  return (
+    <div className="mb-8 rounded-xl border p-4">
+      <h2 className="mb-4 text-lg font-semibold">Property Performance</h2>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={chartData}>
+          <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+          <YAxis tick={{ fontSize: 12 }} />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="views" fill="hsl(var(--primary))" name="Views" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="saves" fill="hsl(142, 71%, 45%)" name="Saves" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
 const ManagePropertiesPage = () => {
   return (
     <ProtectedRoute>
@@ -67,6 +97,7 @@ const ManagePropertiesPage = () => {
           </div>
 
           <SummaryCards />
+          <PropertyChart />
           <PropertyManagementTable />
         </div>
       </RoleGuard>
