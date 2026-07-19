@@ -71,7 +71,7 @@ const PropertyChart = () => {
 
   if (properties.length === 0) return null;
 
-  const chartData = properties.map((p) => ({
+  const chartData = properties.map((p: any) => ({
     name: p.title.length > 15 ? p.title.slice(0, 15) + "..." : p.title,
     views: p.viewCount,
     saves: p.saveCount,

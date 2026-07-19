@@ -78,7 +78,7 @@ const PropertiesPage = () => {
     limit: 12,
   });
 
-  const properties = (data?.data || []).map((p) => ({
+  const properties = (data?.data || []).map((p: any) => ({
     ...p,
     _id: p._id?.toString(),
   }));
