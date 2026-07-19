@@ -10,11 +10,11 @@ import { PropertyInfoGrid } from "./PropertyInfoGrid";
 import { PricingSection } from "./PricingSection";
 import { PolicySection } from "./PolicySection";
 import { RulesSection } from "./RulesSection";
+import { ReviewList } from "@/components/reviews/ReviewList";
+import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { useTrackInteraction, useInteractionState } from "@/hooks/useInteractions";
 import { useSession } from "@/hooks/useAuth";
-import { useReviews } from "@/hooks/useReviews";
 import { Property } from "@/../../rentivo-server/src/types";
-import { Star } from "lucide-react";
 
 interface PropertyDetailsProps {
   property: Property;
@@ -25,7 +25,6 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
   const { data: session } = useSession();
   const trackInteraction = useTrackInteraction();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { data: reviewData } = useReviews(property._id?.toString() || "");
   const propertyId = property._id?.toString() || "";
   const { data: interactionStateData } = useInteractionState(propertyId);
   const [interactionState, setInteractionState] = useState<"idle" | "saved">("idle");
@@ -115,20 +114,6 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
             </div>
           </div>
 
-          {reviewData && (
-            <div className="rounded-xl border p-4">
-              <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 fill-warning text-warning" />
-                <span className="text-lg font-semibold">
-                  {reviewData.averageRating?.toFixed(1) || "N/A"}
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  ({reviewData.totalReviews} reviews)
-                </span>
-              </div>
-            </div>
-          )}
-
           {session && (
             <Button
               onClick={handleSave}
@@ -161,6 +146,17 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
           <PolicySection property={property} />
           <RulesSection property={property} />
         </div>
+      </div>
+
+      <div className="space-y-8">
+        <div>
+          <h2 className="mb-4 text-xl font-bold">Reviews</h2>
+          <ReviewList propertyId={propertyId} />
+        </div>
+
+        {session && (
+          <ReviewForm propertyId={propertyId} />
+        )}
       </div>
 
       {relatedProperties.length > 0 && (
