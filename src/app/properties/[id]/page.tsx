@@ -54,7 +54,7 @@ const PropertyDetailPage = ({
     );
   }
 
-  const relatedProperties = (relatedData || []).map((p) => ({
+  const relatedProperties = (relatedData || []).map((p: any) => ({
     ...p,
     _id: p._id?.toString(),
   }));
