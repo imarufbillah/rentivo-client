@@ -33,6 +33,7 @@ export const PropertyDetails = ({ property, owner, relatedProperties = [] }: Pro
   const propertyId = property._id?.toString() || "";
   const { data: interactionStateData } = useInteractionState(propertyId);
   const [interactionState, setInteractionState] = useState<"idle" | "saved">("idle");
+  const [isSaving, setIsSaving] = useState(false);
   const viewTrackedRef = useRef(false);
 
   const isOwner = !!session && !!owner && session.user.id === owner._id?.toString();
@@ -58,6 +59,7 @@ export const PropertyDetails = ({ property, owner, relatedProperties = [] }: Pro
 
   const handleSave = () => {
     if (!session || !property._id) return;
+    setIsSaving(true);
     trackInteraction.mutate(
       { propertyId: property._id.toString(), type: "save" },
       {
@@ -67,6 +69,9 @@ export const PropertyDetails = ({ property, owner, relatedProperties = [] }: Pro
         },
         onError: () => {
           toast.error("Failed to save property. Please try again.");
+        },
+        onSettled: () => {
+          setIsSaving(false);
         },
       }
     );
@@ -128,7 +133,7 @@ export const PropertyDetails = ({ property, owner, relatedProperties = [] }: Pro
             <Button
               onClick={handleSave}
               className="w-full"
-              disabled={trackInteraction.isPending || interactionState === "saved"}
+              disabled={isSaving || interactionState === "saved"}
             >
               {interactionState === "saved" ? "Saved ✓" : "Save Property"}
             </Button>
