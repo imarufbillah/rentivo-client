@@ -27,10 +27,20 @@ export const useProperties = (filters?: PropertyFiltersParams) => {
   });
 };
 
+export interface PropertyOwner {
+  _id: string;
+  name: string;
+  avatar?: string;
+  bio?: string;
+  phone?: string;
+  isVerified?: boolean;
+  createdAt: string;
+}
+
 export const useProperty = (id: string) => {
   return useQuery({
     queryKey: ['properties', id],
-    queryFn: () => apiClient.get<{ property: Property }>(`/api/properties/${id}`),
+    queryFn: () => apiClient.get<{ property: Property; owner: PropertyOwner | null }>(`/api/properties/${id}`),
     enabled: !!id,
   });
 };

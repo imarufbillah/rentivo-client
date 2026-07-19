@@ -11,6 +11,7 @@ const PropertyDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
   const router = useRouter();
   const { data, isLoading, error } = useProperty(id);
   const property = data?.property;
+  const owner = data?.owner;
 
   const { data: relatedData } = useRelatedProperties(
     property?.location || "",
@@ -50,7 +51,7 @@ const PropertyDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-8">
-      <PropertyDetails property={property} relatedProperties={relatedProperties as any} />
+      <PropertyDetails property={property} owner={owner} relatedProperties={relatedProperties as any} />
     </div>
   );
 };

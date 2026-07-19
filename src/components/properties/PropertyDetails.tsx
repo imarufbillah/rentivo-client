@@ -10,18 +10,21 @@ import { PropertyInfoGrid } from "./PropertyInfoGrid";
 import { PricingSection } from "./PricingSection";
 import { PolicySection } from "./PolicySection";
 import { RulesSection } from "./RulesSection";
+import { OwnerCard } from "./OwnerCard";
 import { ReviewList } from "@/components/reviews/ReviewList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { useTrackInteraction, useInteractionState } from "@/hooks/useInteractions";
 import { useSession } from "@/hooks/useAuth";
 import { Property } from "@/../../rentivo-server/src/types";
+import { PropertyOwner } from "@/hooks/useProperties";
 
 interface PropertyDetailsProps {
   property: Property;
+  owner?: PropertyOwner | null;
   relatedProperties?: Property[];
 }
 
-export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDetailsProps) => {
+export const PropertyDetails = ({ property, owner, relatedProperties = [] }: PropertyDetailsProps) => {
   const { data: session } = useSession();
   const trackInteraction = useTrackInteraction();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -145,6 +148,7 @@ export const PropertyDetails = ({ property, relatedProperties = [] }: PropertyDe
           <PricingSection property={property} />
           <PolicySection property={property} />
           <RulesSection property={property} />
+          {owner && <OwnerCard owner={owner} />}
         </div>
       </div>
 
