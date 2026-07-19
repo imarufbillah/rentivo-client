@@ -33,6 +33,7 @@ export const Navbar = () => {
     { href: "/properties", label: "Properties" },
     ...(isAuthenticated ? [{ href: "/dashboard", label: "Dashboard" }] : []),
     ...(isAuthenticated ? [{ href: "/saved", label: "Saved" }] : []),
+    ...(isAuthenticated ? [{ href: "/history", label: "History" }] : []),
     ...(isOwner ? [{ href: "/properties/manage", label: "My Properties" }] : []),
   ];
 
