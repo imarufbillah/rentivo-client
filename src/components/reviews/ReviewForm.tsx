@@ -90,7 +90,6 @@ export const ReviewForm = ({ propertyId, onSuccess }: ReviewFormProps) => {
               onMouseLeave={() => setHoverRating(0)}
               className="flex min-h-[44px] min-w-[44px] items-center justify-center text-2xl transition-colors"
               aria-label={`Rate ${star} stars`}
-              aria-pressed={star <= rating}
               role="radio"
               aria-checked={star === rating}
             >

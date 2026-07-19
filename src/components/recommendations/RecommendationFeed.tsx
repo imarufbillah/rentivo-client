@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useRecommendations } from "@/hooks/useRecommendations";
 import { getErrorMessage, isLLMServiceError } from "@/lib/api/error";
-import { AlertTriangle, Sparkles, SearchX } from "lucide-react";
+import { AlertTriangle, SearchX } from "lucide-react";
 
 export const RecommendationFeed = () => {
   const [filters, setFilters] = useState<FilterState>({
