@@ -101,6 +101,7 @@ export const ChatWidget = () => {
     };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
+    inputRef.current?.focus();
     setIsStreaming(true);
 
     try {
