@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PropertyCard } from "./PropertyCard";
+import { BookingCard } from "./BookingCard";
 import { ListingMeta } from "./ListingMeta";
 import { PropertyInfoGrid } from "./PropertyInfoGrid";
 import { PricingSection } from "./PricingSection";
 import { PolicySection } from "./PolicySection";
 import { RulesSection } from "./RulesSection";
 import { OwnerCard } from "./OwnerCard";
-import { RentButton } from "./RentButton";
 import { ReviewList } from "@/components/reviews/ReviewList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import {
@@ -24,7 +24,7 @@ import { usePropertyRentalStatus } from "@/hooks/useRentals";
 import { useSession } from "@/hooks/useAuth";
 import { Property } from "@/types";
 import { PropertyOwner } from "@/hooks/useProperties";
-import { Heart, LogIn } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, LogIn } from "lucide-react";
 
 interface PropertyDetailsProps {
   property: Property;
@@ -48,6 +48,7 @@ export const PropertyDetails = ({
   );
   const [isSaving, setIsSaving] = useState(false);
   const viewTrackedRef = useRef(false);
+  const galleryRef = useRef<HTMLDivElement>(null);
 
   const isOwner =
     !!session &&
@@ -118,6 +119,31 @@ export const PropertyDetails = ({
 
   const images = property.images;
 
+  const goToPrev = useCallback(() => {
+    if (images.length <= 1) return;
+    setCurrentImageIndex((i) => (i === 0 ? images.length - 1 : i - 1));
+  }, [images.length]);
+
+  const goToNext = useCallback(() => {
+    if (images.length <= 1) return;
+    setCurrentImageIndex((i) => (i === images.length - 1 ? 0 : i + 1));
+  }, [images.length]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!galleryRef.current?.contains(document.activeElement)) return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        goToPrev();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        goToNext();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [goToPrev, goToNext]);
+
   return (
     <div className="mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
@@ -146,8 +172,14 @@ export const PropertyDetails = ({
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Left: Gallery + Description */}
         <div className="space-y-6 lg:col-span-2">
-          {/* Main image */}
-          <div className="relative aspect-video w-full overflow-hidden rounded-2xl">
+          {/* Main image with gallery nav */}
+          <div
+            ref={galleryRef}
+            className="relative aspect-video w-full overflow-hidden rounded-2xl"
+            tabIndex={0}
+            role="group"
+            aria-label="Property image gallery"
+          >
             {images.length > 0 ? (
               <Image
                 src={images[currentImageIndex]}
@@ -161,6 +193,30 @@ export const PropertyDetails = ({
               <div className="flex h-full items-center justify-center bg-muted text-muted-foreground">
                 No images available
               </div>
+            )}
+
+            {/* Gallery nav arrows */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={goToPrev}
+                  aria-label="Previous image"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-background/80 text-foreground shadow-md backdrop-blur-sm transition-colors hover:bg-background"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={goToNext}
+                  aria-label="Next image"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-background/80 text-foreground shadow-md backdrop-blur-sm transition-colors hover:bg-background"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+                {/* Image counter */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-background/80 px-3 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
+                  {currentImageIndex + 1} / {images.length}
+                </div>
+              </>
             )}
           </div>
 
@@ -196,59 +252,16 @@ export const PropertyDetails = ({
           <ListingMeta property={property} />
         </div>
 
-        {/* Right: Sidebar */}
+        {/* Right: Sidebar — uses shared BookingCard */}
         <div className="space-y-5 lg:sticky lg:top-24 lg:self-start">
-          {/* Price */}
-          <div className="rounded-2xl border bg-card p-5">
-            <div className="text-3xl font-bold text-foreground">
-              ${property.price.toLocaleString()}
-              <span className="text-base font-normal text-muted-foreground">
-                /mo
-              </span>
-            </div>
-          </div>
-
-          {/* Save + Rent buttons — authenticated */}
-          {session && (
-            <div className="flex gap-3">
-              <Button
-                onClick={handleSaveToggle}
-                variant="outline"
-                className="flex-1 rounded-full"
-                disabled={isSaving}
-              >
-                <Heart
-                  className={`mr-2 h-4 w-4 ${
-                    interactionState === "saved" ? "fill-primary text-primary" : ""
-                  }`}
-                />
-                {interactionState === "saved" ? "Saved" : "Save"}
-              </Button>
-            </div>
-          )}
-
-          {/* Guest CTAs */}
-          {!session && (
-            <div className="flex flex-col gap-2">
-              <Link href={`/login?callbackUrl=${encodeURIComponent(`/properties/${propertyId}`)}`}>
-                <Button variant="outline" className="w-full rounded-full">
-                  <Heart className="mr-2 h-4 w-4" />
-                  Sign in to save
-                </Button>
-              </Link>
-              <Link href={`/login?callbackUrl=${encodeURIComponent(`/properties/${propertyId}`)}`}>
-                <Button className="w-full rounded-full" size="lg">
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Sign in to rent
-                </Button>
-              </Link>
-            </div>
-          )}
-
-          {/* Rent button — authenticated */}
-          {session && (
-            <RentButton property={property} isOwner={isOwner} />
-          )}
+          <BookingCard
+            property={property}
+            isSaved={interactionState === "saved"}
+            isOwner={isOwner}
+            isAuthenticated={!!session}
+            isSaving={isSaving}
+            onSaveToggle={handleSaveToggle}
+          />
 
           {/* Info grid */}
           <PropertyInfoGrid property={property} />
@@ -299,6 +312,52 @@ export const PropertyDetails = ({
             {relatedProperties.map((p: any) => (
               <PropertyCard key={p._id?.toString()} property={p} />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile bottom booking bar */}
+      {!isOwner && (
+        <div className="fixed inset-x-0 bottom-0 z-modal border-t bg-card/95 backdrop-blur-sm lg:hidden">
+          <div className="flex items-center justify-between gap-4 px-4 py-3">
+            <div>
+              <span className="text-xl font-bold text-foreground">
+                ${property.price.toLocaleString()}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                /{property.rentFrequency === "weekly" ? "wk" : property.rentFrequency === "daily" ? "day" : "mo"}
+              </span>
+            </div>
+            <div className="flex gap-2">
+              {!session ? (
+                <Link href={`/login?callbackUrl=${encodeURIComponent(`/properties/${propertyId}`)}`}>
+                  <Button size="lg" className="rounded-full">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign in to rent
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={handleSaveToggle}
+                    className="rounded-full"
+                    disabled={isSaving}
+                  >
+                    <Heart
+                      className={`h-4 w-4 ${
+                        interactionState === "saved" ? "fill-primary text-primary" : ""
+                      }`}
+                    />
+                  </Button>
+                  <Link href="#booking">
+                    <Button size="lg" className="rounded-full">
+                      Rent Now
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
