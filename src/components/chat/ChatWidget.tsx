@@ -335,7 +335,7 @@ export const ChatWidget = () => {
 
               <form
                 onSubmit={handleSubmit}
-                className="flex gap-2 border-t p-3"
+                className="flex gap-2 border-t mt-2 p-3"
               >
                 <input
                   ref={inputRef}
