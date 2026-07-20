@@ -255,7 +255,7 @@ const PropertiesPage = () => {
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         {/* Sidebar — desktop always, mobile conditional */}
-        <aside className={`${mobileFiltersOpen ? "block" : "hidden"} lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto`}>
+        <aside className={`${mobileFiltersOpen ? "block" : "hidden"} lg:block lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto`}>
           <PropertyFilters
             onFilterChange={handleFilterChange}
             initialFilters={filters}
