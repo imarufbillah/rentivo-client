@@ -1,21 +1,40 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Home, Users, Star, MapPin } from "lucide-react";
-
-const stats = [
-  { icon: Home, value: "500+", label: "Properties Listed" },
-  { icon: Users, value: "200+", label: "Happy Renters" },
-  { icon: Star, value: "4.8", label: "Average Rating" },
-  { icon: MapPin, value: "50+", label: "Cities Covered" },
-];
+import { Home, Users, Star, MessageSquare } from "lucide-react";
+import { useStats } from "@/hooks/useStats";
 
 export const StatsBar = () => {
+  const { data: stats } = useStats();
+
+  const items = [
+    {
+      icon: Home,
+      value: stats ? `${stats.properties}+` : "—",
+      label: "Properties Listed",
+    },
+    {
+      icon: Users,
+      value: stats ? `${stats.renters}+` : "—",
+      label: "Renters",
+    },
+    {
+      icon: Star,
+      value: stats?.averageRating ? stats.averageRating.toFixed(1) : "—",
+      label: "Average Rating",
+    },
+    {
+      icon: MessageSquare,
+      value: stats ? `${stats.reviews}+` : "—",
+      label: "Reviews",
+    },
+  ];
+
   return (
-    <section className="border-y bg-muted/30 py-14">
+    <section className="border-y bg-muted/30 py-14" aria-label="Platform statistics">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          {stats.map((stat, i) => (
+          {items.map((stat, i) => (
             <motion.div
               key={stat.label}
               className="flex flex-col items-center gap-3 text-center"

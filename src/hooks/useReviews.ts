@@ -28,3 +28,18 @@ export const useCreateReview = () => {
     },
   });
 };
+
+interface ReviewWithUser extends Review {
+  userName?: string;
+  userAvatar?: string;
+  propertyTitle?: string;
+  propertyLocation?: string;
+}
+
+export const useRecentReviews = () => {
+  return useQuery({
+    queryKey: ['reviews', 'recent'],
+    queryFn: () => apiClient.get<{ reviews: ReviewWithUser[] }>('/api/reviews/recent'),
+    staleTime: 5 * 60 * 1000,
+  });
+};
