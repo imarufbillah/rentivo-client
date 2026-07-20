@@ -263,10 +263,10 @@ export const PropertyForm = ({
   };
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-4xl">
       {/* Step indicator */}
       <nav aria-label="Property form steps" className="mb-8">
-        <ol className="flex flex-wrap items-center gap-y-3">
+        <ol className="flex items-center">
           {steps.map((s, i) => (
             <li key={s.label} className="flex items-center gap-2">
               <button
@@ -297,7 +297,7 @@ export const PropertyForm = ({
               </span>
               {i < steps.length - 1 && (
                 <div
-                  className={`mx-1 hidden h-px w-4 sm:block lg:w-8 ${
+                  className={`mx-2 h-px w-6 sm:w-10 ${
                     i < step ? "bg-primary" : "bg-border"
                   }`}
                 />
