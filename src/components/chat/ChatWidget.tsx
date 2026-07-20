@@ -101,7 +101,6 @@ export const ChatWidget = () => {
     };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    inputRef.current?.focus();
     setIsStreaming(true);
 
     try {
@@ -344,8 +343,7 @@ export const ChatWidget = () => {
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type a message..."
                   aria-label="Type a message"
-                  disabled={isStreaming}
-                  className="flex-1 rounded-full border bg-background px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                  className="flex-1 rounded-full border bg-background px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
                 />
                 <button
                   type="submit"
@@ -493,8 +491,7 @@ export const ChatWidget = () => {
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type a message..."
                   aria-label="Type a message"
-                  disabled={isStreaming}
-                  className="flex-1 rounded-full border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                  className="flex-1 rounded-full border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
                 />
                 <button
                   type="submit"
