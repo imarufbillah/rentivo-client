@@ -57,6 +57,7 @@ const sortOptions = [
   { value: "createdAt", label: "Newest" },
   { value: "price", label: "Price" },
   { value: "bedrooms", label: "Bedrooms" },
+  { value: "averageRating", label: "Top Rated" },
 ];
 
 export const PropertyFilters = ({
