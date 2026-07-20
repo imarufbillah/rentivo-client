@@ -100,7 +100,7 @@ export const Navbar = () => {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/properties", label: "Properties" },
+    { href: "/properties", label: "Properties", exact: true },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
   ];
@@ -110,8 +110,8 @@ export const Navbar = () => {
     window.location.href = "/";
   };
 
-  const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(href + "/");
+  const isActive = (href: string, exact?: boolean) =>
+    exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
 
   return (
     <>
@@ -144,13 +144,13 @@ export const Navbar = () => {
                   key={link.href}
                   href={link.href}
                   className={`relative px-4 py-2 text-sm font-medium rounded-full transition-colors ${
-                    isActive(link.href)
+                    isActive(link.href, link.exact)
                       ? "text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`}
                 >
                   {link.label}
-                  {isActive(link.href) && (
+                  {isActive(link.href, link.exact) && (
                     <motion.div
                       layoutId="nav-indicator"
                       className="absolute inset-0 rounded-full bg-primary/10 -z-10"
@@ -414,7 +414,7 @@ export const Navbar = () => {
                     <Link
                       href={link.href}
                       className={`block rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
-                        isActive(link.href)
+                        isActive(link.href, link.exact)
                           ? "bg-primary/10 text-primary"
                           : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                       }`}
