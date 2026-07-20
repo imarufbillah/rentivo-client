@@ -78,18 +78,11 @@ export const ChatWidget = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // Lock body scroll only on mobile when chat overlay is open
   useEffect(() => {
-    const isMobile = window.matchMedia("(max-width: 1023px)").matches;
-    if (isOpen && isMobile) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isOpen]);
+  }, []);
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isStreaming) return;
@@ -375,7 +368,7 @@ export const ChatWidget = () => {
         </motion.button>
       </div>
 
-      {/* Mobile: full-screen overlay */}
+      {/* Mobile: bottom-sheet panel */}
       <div className="lg:hidden">
         {/* FAB */}
         {!isOpen && (
@@ -389,7 +382,7 @@ export const ChatWidget = () => {
           </button>
         )}
 
-        {/* Full-screen chat */}
+        {/* Bottom-sheet chat panel */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -401,8 +394,14 @@ export const ChatWidget = () => {
               animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: "100%" }}
               transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-0 z-chat flex flex-col bg-background"
+              className="fixed bottom-0 left-0 right-0 z-chat flex max-h-[80dvh] flex-col rounded-t-2xl border bg-background shadow-xl"
+              style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
             >
+              {/* Drag handle */}
+              <div className="flex justify-center pt-2">
+                <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
+              </div>
+
               {/* Header */}
               <div className="flex items-center justify-between border-b px-4 py-3">
                 <div>
@@ -483,7 +482,6 @@ export const ChatWidget = () => {
               <form
                 onSubmit={handleSubmit}
                 className="flex gap-2 border-t p-3"
-                style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
               >
                 <input
                   ref={inputRef}
