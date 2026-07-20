@@ -90,13 +90,13 @@ const PropertyChart = () => {
           <Legend />
           <Bar
             dataKey="views"
-            fill="hsl(var(--primary))"
+            fill="var(--chart-1)"
             name="Views"
             radius={[4, 4, 0, 0]}
           />
           <Bar
             dataKey="saves"
-            fill="hsl(142, 71%, 45%)"
+            fill="var(--chart-3)"
             name="Saves"
             radius={[4, 4, 0, 0]}
           />

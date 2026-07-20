@@ -8,10 +8,17 @@ interface PricingSectionProps {
 }
 
 export const PricingSection = ({ property }: PricingSectionProps) => {
+  const rentLabel =
+    property.rentFrequency === "weekly"
+      ? "/week"
+      : property.rentFrequency === "daily"
+        ? "/day"
+        : "/mo";
+
   const items = [
     {
       icon: DollarSign,
-      label: "Monthly Rent",
+      label: `Rent${rentLabel !== "/mo" ? ` (${property.rentFrequency})` : ""}`,
       value: `$${property.price.toLocaleString()}`,
       highlight: true,
     },
@@ -73,7 +80,7 @@ export const PricingSection = ({ property }: PricingSectionProps) => {
               {value}
               {highlight && (
                 <span className="text-sm font-normal text-muted-foreground">
-                  /mo
+                  {rentLabel}
                 </span>
               )}
             </span>
