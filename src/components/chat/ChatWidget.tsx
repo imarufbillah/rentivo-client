@@ -247,7 +247,7 @@ export const ChatWidget = () => {
   return (
     <>
       {/* Desktop: floating panel */}
-      <div className="fixed bottom-4 right-4 z-chat hidden lg:block">
+      <div className="fixed bottom-4 right-4 z-chat hidden lg:block flex flex-col items-end">
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -382,7 +382,7 @@ export const ChatWidget = () => {
           <button
             ref={triggerRef}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-4 right-4 z-chat flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
+            className="fixed bottom-20 right-4 z-chat flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
             aria-label="Open chat"
           >
             <MessageCircle className="h-5 w-5" />

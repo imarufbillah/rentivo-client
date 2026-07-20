@@ -45,11 +45,11 @@ export default function RootLayout({
       className={`${dmSans.variable} ${plusJakarta.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col pb-16 lg:pb-0">
         <Providers>
           <ScrollToTop />
           <Navbar />
-          <main className="flex-1 pt-20 pb-16 lg:pb-0">
+            <main className="flex-1 pt-20">
             <ErrorBoundary>{children}</ErrorBoundary>
           </main>
           <Footer />

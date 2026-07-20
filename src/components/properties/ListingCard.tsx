@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, BedDouble, Bath, Star } from "lucide-react";
+import { MapPin, BedDouble, Bath, Star, ArrowRight } from "lucide-react";
 import { Property } from "@/types";
 
 interface ListingCardProps {
@@ -15,92 +15,101 @@ export const ListingCard = ({ property, badge, meta }: ListingCardProps) => {
   const propertyId = property._id?.toString() || "";
 
   return (
-    <Link href={`/properties/${propertyId}`} className="group block">
-      <div className="overflow-hidden rounded-2xl border bg-card shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
-        {/* Image */}
-        <div className="relative aspect-[4/3] w-full overflow-hidden">
-          {property.images?.[0] ? (
-            <Image
-              src={property.images[0]}
-              alt={property.title}
-              fill
-              className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center bg-muted text-sm text-muted-foreground">
-              No image
-            </div>
-          )}
-          {/* Type badge */}
-          <div className="absolute left-3 top-3">
-            <span className="rounded-full bg-background/80 px-3 py-1 text-xs font-medium backdrop-blur-sm">
-              {property.propertyType}
+    <div className="h-full flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+      {/* Image */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden">
+        {property.images?.[0] ? (
+          <Image
+            src={property.images[0]}
+            alt={property.title}
+            fill
+            className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center bg-muted text-sm text-muted-foreground">
+            No image
+          </div>
+        )}
+        {/* Type badge */}
+        <div className="absolute left-3 top-3">
+          <span className="rounded-full bg-background/80 px-3 py-1 text-xs font-medium backdrop-blur-sm">
+            {property.propertyType}
+          </span>
+        </div>
+        {/* Rating badge */}
+        {property.averageRating != null && (
+          <div className="absolute right-3 top-3">
+            <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
+              <Star className="h-3 w-3 fill-warning text-warning" />
+              {property.averageRating.toFixed(1)}
             </span>
           </div>
-          {/* Rating badge */}
-          {property.averageRating != null && (
-            <div className="absolute right-3 top-3">
-              <span className="flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
-                <Star className="h-3 w-3 fill-warning text-warning" />
-                {property.averageRating.toFixed(1)}
-              </span>
-            </div>
-          )}
-          {/* Custom badge overlay */}
-          {badge && <div className="absolute right-3 top-3">{badge}</div>}
+        )}
+        {/* Custom badge overlay */}
+        {badge && <div className="absolute right-3 top-3">{badge}</div>}
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="line-clamp-1 font-display text-base font-bold text-foreground">
+            {property.title}
+          </h3>
+          <span className="whitespace-nowrap text-base font-bold text-foreground">
+            ${property.price.toLocaleString()}
+            <span className="text-xs font-normal text-muted-foreground">
+              /{property.rentFrequency === "weekly" ? "wk" : property.rentFrequency === "daily" ? "day" : "mo"}
+            </span>
+          </span>
         </div>
 
-        {/* Content */}
-        <div className="p-4">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="line-clamp-1 font-display text-base font-bold text-foreground group-hover:text-primary transition-colors">
-              {property.title}
-            </h3>
-            <span className="whitespace-nowrap text-base font-bold text-foreground">
-              ${property.price.toLocaleString()}
-              <span className="text-xs font-normal text-muted-foreground">
-                /{property.rentFrequency === "weekly" ? "wk" : property.rentFrequency === "daily" ? "day" : "mo"}
-              </span>
+        <div className="mt-1.5 flex items-center gap-1 text-sm text-muted-foreground">
+          <MapPin className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">{property.location}</span>
+        </div>
+
+        {property.shortDescription && (
+          <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+            {property.shortDescription}
+          </p>
+        )}
+
+        {/* Meta area */}
+        {meta && <div className="mt-2">{meta}</div>}
+
+        {/* Stats */}
+        <div className="mt-3 flex items-center gap-4 border-t pt-3 text-xs text-muted-foreground">
+          {property.bedrooms != null && (
+            <span className="flex items-center gap-1">
+              <BedDouble className="h-3.5 w-3.5" />
+              {property.bedrooms === 0 ? "Studio" : `${property.bedrooms} bed`}
             </span>
-          </div>
-
-          <div className="mt-1.5 flex items-center gap-1 text-sm text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{property.location}</span>
-          </div>
-
-          {property.shortDescription && (
-            <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-              {property.shortDescription}
-            </p>
           )}
+          {property.bathrooms != null && (
+            <span className="flex items-center gap-1">
+              <Bath className="h-3.5 w-3.5" />
+              {property.bathrooms} bath
+            </span>
+          )}
+          {property.reviewCount != null && property.reviewCount > 0 && (
+            <span className="ml-auto text-muted-foreground">
+              {property.reviewCount} review{property.reviewCount !== 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
 
-          {/* Meta area — badge, score, etc. */}
-          {meta && <div className="mt-2">{meta}</div>}
-
-          {/* Stats */}
-          <div className="mt-3 flex items-center gap-4 border-t pt-3 text-xs text-muted-foreground">
-            {property.bedrooms != null && (
-              <span className="flex items-center gap-1">
-                <BedDouble className="h-3.5 w-3.5" />
-                {property.bedrooms === 0 ? "Studio" : `${property.bedrooms} bed`}
-              </span>
-            )}
-            {property.bathrooms != null && (
-              <span className="flex items-center gap-1">
-                <Bath className="h-3.5 w-3.5" />
-                {property.bathrooms} bath
-              </span>
-            )}
-            {property.reviewCount != null && property.reviewCount > 0 && (
-              <span className="ml-auto text-muted-foreground">
-                {property.reviewCount} review{property.reviewCount !== 1 ? "s" : ""}
-              </span>
-            )}
-          </div>
+        {/* View Details button */}
+        <div className="mt-auto pt-3">
+          <Link
+            href={`/properties/${propertyId}`}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+          >
+            View Details
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
