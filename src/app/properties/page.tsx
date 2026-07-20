@@ -8,9 +8,10 @@ import {
   FilterState,
 } from "@/components/properties/PropertyFilters";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useProperties } from "@/hooks/useProperties";
 import { getErrorMessage } from "@/lib/api/error";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, SlidersHorizontal, X } from "lucide-react";
 
 const defaultFilters: FilterState = {
   search: "",
@@ -44,10 +45,37 @@ const parseSearchParams = (searchParams: URLSearchParams): FilterState => ({
   sortOrder: searchParams.get("sortOrder") || "desc",
 });
 
+interface FilterChip {
+  key: string;
+  label: string;
+  amenityKey?: string;
+}
+
+const filterChips = (filters: FilterState): FilterChip[] => {
+  const chips: FilterChip[] = [];
+  if (filters.location) chips.push({ key: "location", label: filters.location });
+  if (filters.propertyType) chips.push({ key: "propertyType", label: filters.propertyType });
+  if (filters.minPrice || filters.maxPrice) {
+    const min = filters.minPrice || "0";
+    const max = filters.maxPrice || "∞";
+    chips.push({ key: "price", label: `$${min} - $${max}` });
+  }
+  if (filters.minBedrooms) chips.push({ key: "minBedrooms", label: `${filters.minBedrooms}+ beds` });
+  if (filters.maxBedrooms) chips.push({ key: "maxBedrooms", label: `≤${filters.maxBedrooms} beds` });
+  if (filters.minRating) chips.push({ key: "minRating", label: `${filters.minRating}+ stars` });
+  if (filters.amenities) {
+    filters.amenities.split(",").filter(Boolean).forEach((a) => {
+      chips.push({ key: `amenity-${a}`, label: a, amenityKey: a });
+    });
+  }
+  return chips;
+};
+
 const PropertiesPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [page, setPage] = useState(1);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>(() =>
     parseSearchParams(searchParams)
   );
@@ -85,6 +113,7 @@ const PropertiesPage = () => {
 
   const pagination = data?.pagination;
   const totalPages = pagination?.totalPages || 1;
+  const totalResults = pagination?.total || 0;
 
   const handleFilterChange = useCallback(
     (newFilters: FilterState) => {
@@ -119,6 +148,24 @@ const PropertiesPage = () => {
     [router]
   );
 
+  const handleRemoveChip = useCallback(
+    (chip: { key: string; label: string; amenityKey?: string }) => {
+      const newFilters = { ...filters };
+      if (chip.amenityKey) {
+        const amenities = filters.amenities.split(",").filter(Boolean);
+        newFilters.amenities = amenities.filter((a) => a !== chip.amenityKey).join(",");
+      } else {
+        (newFilters as Record<string, string>)[chip.key] = "";
+      }
+      handleFilterChange(newFilters);
+    },
+    [filters, handleFilterChange]
+  );
+
+  const handleClearAll = useCallback(() => {
+    handleFilterChange(defaultFilters);
+  }, [handleFilterChange]);
+
   const handlePageChange = useCallback(
     (newPage: number) => {
       setPage(newPage);
@@ -129,22 +176,74 @@ const PropertiesPage = () => {
     [router, searchParams]
   );
 
+  const chips = filterChips(filters);
+  const hasActiveFilters = chips.length > 0 || filters.search;
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
           Find Your Perfect Property
         </h1>
-        <p className="mt-2 text-lg text-muted-foreground">
-          Browse available rental properties or use filters to narrow your
-          search
-        </p>
+        {totalResults > 0 && (
+          <p className="mt-2 text-sm text-muted-foreground">
+            {totalResults} {totalResults === 1 ? "property" : "properties"} found
+          </p>
+        )}
       </div>
 
+      {/* Mobile filter toggle + active chips */}
+      <div className="mb-4 flex flex-wrap items-center gap-2 lg:hidden">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+          className="rounded-full"
+        >
+          <SlidersHorizontal className="mr-2 h-4 w-4" />
+          Filters
+          {chips.length > 0 && (
+            <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
+              {chips.length}
+            </Badge>
+          )}
+        </Button>
+      </div>
+
+      {/* Desktop active filter chips */}
+      {hasActiveFilters && (
+        <div className="mb-4 hidden flex-wrap items-center gap-2 lg:flex">
+          {chips.map((chip) => (
+            <Badge
+              key={chip.key + (chip.amenityKey || "")}
+              variant="secondary"
+              className="gap-1 rounded-full pr-1"
+            >
+              {chip.label}
+              <button
+                onClick={() => handleRemoveChip(chip)}
+                className="ml-1 rounded-full p-0.5 hover:bg-muted"
+                aria-label={`Remove ${chip.label} filter`}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClearAll}
+            className="h-7 rounded-full text-xs text-muted-foreground"
+          >
+            Clear all
+          </Button>
+        </div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-        {/* Sidebar */}
-        <aside>
+        {/* Sidebar — desktop always, mobile conditional */}
+        <aside className={`${mobileFiltersOpen ? "block" : "hidden"} lg:block`}>
           <PropertyFilters
             onFilterChange={handleFilterChange}
             initialFilters={filters}

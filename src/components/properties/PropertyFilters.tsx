@@ -3,6 +3,14 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAmenities } from "@/hooks/useProperties";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 
@@ -27,7 +35,29 @@ export interface FilterState {
   sortOrder: string;
 }
 
-const propertyTypes = ["", "apartment", "house", "room", "studio", "villa"];
+const propertyTypes = [
+  { value: "all", label: "All Types" },
+  { value: "apartment", label: "Apartment" },
+  { value: "house", label: "House" },
+  { value: "room", label: "Room" },
+  { value: "studio", label: "Studio" },
+  { value: "villa", label: "Villa" },
+];
+
+const ratingOptions = [
+  { value: "all", label: "Any" },
+  { value: "1", label: "1+" },
+  { value: "2", label: "2+" },
+  { value: "3", label: "3+" },
+  { value: "4", label: "4+" },
+  { value: "5", label: "5 only" },
+];
+
+const sortOptions = [
+  { value: "createdAt", label: "Newest" },
+  { value: "price", label: "Price" },
+  { value: "bedrooms", label: "Bedrooms" },
+];
 
 export const PropertyFilters = ({
   onFilterChange,
@@ -170,117 +200,143 @@ export const PropertyFilters = ({
           value={filters.search}
           onChange={(e) => updateFilter("search", e.target.value)}
           placeholder="Search properties..."
+          aria-label="Search properties"
           className="rounded-xl pl-9"
         />
       </div>
 
       {/* Location + Type */}
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          value={filters.location}
-          onChange={(e) => updateFilter("location", e.target.value)}
-          placeholder="Location"
-          className="rounded-xl"
-        />
-        <select
-          value={filters.propertyType}
-          onChange={(e) => updateFilter("propertyType", e.target.value)}
-          className="rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        >
-          {propertyTypes.map((type) => (
-            <option key={type} value={type}>
-              {type
-                ? type.charAt(0).toUpperCase() + type.slice(1)
-                : "All Types"}
-            </option>
-          ))}
-        </select>
+      <div className="space-y-3">
+        <div>
+          <Label htmlFor="filter-location" className="text-xs text-muted-foreground">
+            Location
+          </Label>
+          <Input
+            id="filter-location"
+            value={filters.location}
+            onChange={(e) => updateFilter("location", e.target.value)}
+            placeholder="City, neighborhood..."
+            className="mt-1 rounded-xl"
+          />
+        </div>
+        <div>
+          <Label className="text-xs text-muted-foreground">Property Type</Label>
+          <Select
+            value={filters.propertyType || "all"}
+            onValueChange={(v) => updateFilter("propertyType", !v || v === "all" ? "" : v)}
+          >
+            <SelectTrigger className="mt-1 rounded-xl" aria-label="Property type">
+              <SelectValue placeholder="All Types" />
+            </SelectTrigger>
+            <SelectContent>
+              {propertyTypes.map((type) => (
+                <SelectItem key={type.value} value={type.value}>
+                  {type.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Price range */}
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          type="number"
-          value={filters.minPrice}
-          onChange={(e) => updateFilter("minPrice", e.target.value)}
-          placeholder="Min price"
-          className="rounded-xl"
-        />
-        <Input
-          type="number"
-          value={filters.maxPrice}
-          onChange={(e) => updateFilter("maxPrice", e.target.value)}
-          placeholder="Max price"
-          className="rounded-xl"
-        />
+      <div>
+        <Label className="text-xs text-muted-foreground">Price Range</Label>
+        <div className="mt-1 grid grid-cols-2 gap-2">
+          <Input
+            type="number"
+            value={filters.minPrice}
+            onChange={(e) => updateFilter("minPrice", e.target.value)}
+            placeholder="Min"
+            aria-label="Minimum price"
+            className="rounded-xl"
+          />
+          <Input
+            type="number"
+            value={filters.maxPrice}
+            onChange={(e) => updateFilter("maxPrice", e.target.value)}
+            placeholder="Max"
+            aria-label="Maximum price"
+            className="rounded-xl"
+          />
+        </div>
       </div>
 
       {/* Bedrooms */}
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          type="number"
-          value={filters.minBedrooms}
-          onChange={(e) => updateFilter("minBedrooms", e.target.value)}
-          placeholder="Min beds"
-          min="0"
-          className="rounded-xl"
-        />
-        <Input
-          type="number"
-          value={filters.maxBedrooms}
-          onChange={(e) => updateFilter("maxBedrooms", e.target.value)}
-          placeholder="Max beds"
-          min="0"
-          className="rounded-xl"
-        />
+      <div>
+        <Label className="text-xs text-muted-foreground">Bedrooms</Label>
+        <div className="mt-1 grid grid-cols-2 gap-2">
+          <Input
+            type="number"
+            value={filters.minBedrooms}
+            onChange={(e) => updateFilter("minBedrooms", e.target.value)}
+            placeholder="Min"
+            aria-label="Minimum bedrooms"
+            min="0"
+            className="rounded-xl"
+          />
+          <Input
+            type="number"
+            value={filters.maxBedrooms}
+            onChange={(e) => updateFilter("maxBedrooms", e.target.value)}
+            placeholder="Max"
+            aria-label="Maximum bedrooms"
+            min="0"
+            className="rounded-xl"
+          />
+        </div>
       </div>
 
       {/* Bathrooms */}
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          type="number"
-          value={filters.minBathrooms}
-          onChange={(e) => updateFilter("minBathrooms", e.target.value)}
-          placeholder="Min baths"
-          min="0"
-          className="rounded-xl"
-        />
-        <Input
-          type="number"
-          value={filters.maxBathrooms}
-          onChange={(e) => updateFilter("maxBathrooms", e.target.value)}
-          placeholder="Max baths"
-          min="0"
-          className="rounded-xl"
-        />
+      <div>
+        <Label className="text-xs text-muted-foreground">Bathrooms</Label>
+        <div className="mt-1 grid grid-cols-2 gap-2">
+          <Input
+            type="number"
+            value={filters.minBathrooms}
+            onChange={(e) => updateFilter("minBathrooms", e.target.value)}
+            placeholder="Min"
+            aria-label="Minimum bathrooms"
+            min="0"
+            className="rounded-xl"
+          />
+          <Input
+            type="number"
+            value={filters.maxBathrooms}
+            onChange={(e) => updateFilter("maxBathrooms", e.target.value)}
+            placeholder="Max"
+            aria-label="Maximum bathrooms"
+            min="0"
+            className="rounded-xl"
+          />
+        </div>
       </div>
 
       {/* Rating */}
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-          Min Rating
-        </label>
-        <select
-          value={filters.minRating}
-          onChange={(e) => updateFilter("minRating", e.target.value)}
-          className="w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        <Label className="text-xs text-muted-foreground">Min Rating</Label>
+        <Select
+          value={filters.minRating || "all"}
+          onValueChange={(v) => updateFilter("minRating", !v || v === "all" ? "" : v)}
         >
-          <option value="">Any</option>
-          <option value="1">1+</option>
-          <option value="2">2+</option>
-          <option value="3">3+</option>
-          <option value="4">4+</option>
-          <option value="5">5 only</option>
-        </select>
+          <SelectTrigger className="mt-1 rounded-xl" aria-label="Minimum rating">
+            <SelectValue placeholder="Any" />
+          </SelectTrigger>
+          <SelectContent>
+            {ratingOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Amenities */}
       {amenitiesList.length > 0 && (
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-            Amenities
-          </label>
-          <div className="flex flex-wrap gap-2">
+          <Label className="text-xs text-muted-foreground">Amenities</Label>
+          <div className="mt-2 flex flex-wrap gap-2">
             {amenitiesList.map((amenity) => {
               const selected = filters.amenities
                 ?.split(",")
@@ -290,6 +346,7 @@ export const PropertyFilters = ({
                   key={amenity.value}
                   type="button"
                   onClick={() => toggleAmenity(amenity.value)}
+                  aria-pressed={selected}
                   className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                     selected
                       ? "border-primary bg-primary text-primary-foreground"
@@ -305,24 +362,37 @@ export const PropertyFilters = ({
       )}
 
       {/* Sort */}
-      <div className="flex gap-3">
-        <select
-          value={filters.sortBy}
-          onChange={(e) => updateFilter("sortBy", e.target.value)}
-          className="flex-1 rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        >
-          <option value="createdAt">Newest</option>
-          <option value="price">Price</option>
-          <option value="bedrooms">Bedrooms</option>
-        </select>
-        <select
-          value={filters.sortOrder}
-          onChange={(e) => updateFilter("sortOrder", e.target.value)}
-          className="w-24 rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        >
-          <option value="desc">Desc</option>
-          <option value="asc">Asc</option>
-        </select>
+      <div>
+        <Label className="text-xs text-muted-foreground">Sort By</Label>
+        <div className="mt-1 grid grid-cols-2 gap-2">
+          <Select
+            value={filters.sortBy}
+            onValueChange={(v) => updateFilter("sortBy", v || "createdAt")}
+          >
+            <SelectTrigger className="rounded-xl" aria-label="Sort by">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {sortOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={filters.sortOrder}
+            onValueChange={(v) => updateFilter("sortOrder", v || "desc")}
+          >
+            <SelectTrigger className="rounded-xl" aria-label="Sort order">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="desc">Descending</SelectItem>
+              <SelectItem value="asc">Ascending</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );

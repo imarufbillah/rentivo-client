@@ -64,6 +64,8 @@ export interface Property {
   lat?: number;
   lng?: number;
   availableFrom?: Date;
+  averageRating?: number | null;
+  reviewCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }

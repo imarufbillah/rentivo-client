@@ -2,20 +2,11 @@
 
 import { PropertyCard } from "./PropertyCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Property } from "@/types";
 import { Home } from "lucide-react";
 
 interface PropertyGridProps {
-  properties: Array<{
-    _id?: string;
-    title: string;
-    description: string;
-    price: number;
-    location: string;
-    propertyType: string;
-    images: string[];
-    averageRating?: number | null;
-    reviewCount?: number;
-  }>;
+  properties: Property[];
   isLoading?: boolean;
 }
 
