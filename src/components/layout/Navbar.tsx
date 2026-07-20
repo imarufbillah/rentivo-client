@@ -221,7 +221,11 @@ export const Navbar = () => {
                           <div className="py-1">
                             <Link
                               href="/dashboard"
-                              className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                                isActive("/dashboard")
+                                  ? "bg-primary/10 text-primary font-medium"
+                                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              }`}
                               role="menuitem"
                             >
                               <Home className="h-4 w-4" />
@@ -229,7 +233,11 @@ export const Navbar = () => {
                             </Link>
                             <Link
                               href="/saved"
-                              className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                                isActive("/saved")
+                                  ? "bg-primary/10 text-primary font-medium"
+                                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              }`}
                               role="menuitem"
                             >
                               <Heart className="h-4 w-4" />
@@ -237,7 +245,11 @@ export const Navbar = () => {
                             </Link>
                             <Link
                               href="/history"
-                              className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                                isActive("/history")
+                                  ? "bg-primary/10 text-primary font-medium"
+                                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              }`}
                               role="menuitem"
                             >
                               <Clock className="h-4 w-4" />
@@ -245,7 +257,11 @@ export const Navbar = () => {
                             </Link>
                             <Link
                               href="/profile"
-                              className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                                isActive("/profile")
+                                  ? "bg-primary/10 text-primary font-medium"
+                                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              }`}
                               role="menuitem"
                             >
                               <User className="h-4 w-4" />
@@ -256,7 +272,11 @@ export const Navbar = () => {
                             <div className="border-t py-1">
                               <Link
                                 href="/properties/manage"
-                                className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                                  isActive("/properties/manage")
+                                    ? "bg-primary/10 text-primary font-medium"
+                                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                }`}
                                 role="menuitem"
                               >
                                 <BarChart3 className="h-4 w-4" />
