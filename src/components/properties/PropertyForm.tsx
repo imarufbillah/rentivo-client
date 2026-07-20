@@ -262,6 +262,7 @@ export const PropertyForm = ({
                       : "bg-muted text-muted-foreground"
                 }`}
                 aria-current={i === step ? "step" : undefined}
+                aria-label={`${s.label} step${i < step ? " (completed)" : i === step ? " (current)" : ""}`}
               >
                 {i < step ? <Check className="h-4 w-4" /> : i + 1}
               </button>

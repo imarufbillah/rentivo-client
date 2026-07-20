@@ -343,6 +343,7 @@ export const PropertyDetails = ({
                     onClick={handleSaveToggle}
                     className="rounded-full"
                     disabled={isSaving}
+                    aria-label={interactionState === "saved" ? "Remove from saved" : "Save property"}
                   >
                     <Heart
                       className={`h-4 w-4 ${
