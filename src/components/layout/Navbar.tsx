@@ -93,8 +93,8 @@ export const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [profileOpen]);
 
-  // Decluttered nav — only public links + owner CTA
   const navLinks = [
+    { href: "/", label: "Home" },
     { href: "/properties", label: "Properties" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
@@ -488,8 +488,6 @@ export const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* Spacer for fixed navbar */}
-      <div className="h-20" />
     </>
   );
 };

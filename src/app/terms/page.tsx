@@ -1,6 +1,8 @@
+import Link from "next/link";
+
 const TermsPage = () => {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-dvh mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
       <h1 className="font-display text-4xl font-bold tracking-tight">
         Terms of Service
       </h1>
@@ -104,9 +106,9 @@ const TermsPage = () => {
           <p>
             For questions about these Terms of Service, contact us at
             support@rentivo.com or visit our{" "}
-            <a href="/contact" className="text-primary underline">
+            <Link href="/contact" className="text-primary underline">
               Contact page
-            </a>
+            </Link>
             .
           </p>
         </section>

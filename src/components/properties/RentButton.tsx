@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Property } from "@/types";
 import { RentConfirmationDialog } from "./RentConfirmationDialog";
-import { Home } from "lucide-react";
+import { Key } from "lucide-react";
 
 interface RentButtonProps {
   property: Property;
@@ -23,7 +23,7 @@ export const RentButton = ({ property, isOwner }: RentButtonProps) => {
         variant="outline"
         className="w-full rounded-full opacity-60"
       >
-        <Home className="mr-2 h-4 w-4" />
+        <Key className="mr-2 h-4 w-4" />
         Currently Rented
       </Button>
     );
@@ -36,7 +36,7 @@ export const RentButton = ({ property, isOwner }: RentButtonProps) => {
         className="w-full rounded-full"
         size="lg"
       >
-        <Home className="mr-2 h-4 w-4" />
+        <Key className="mr-2 h-4 w-4" />
         Rent This Property
       </Button>
 

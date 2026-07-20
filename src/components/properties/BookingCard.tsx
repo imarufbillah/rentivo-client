@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Heart, LogIn, Loader2, Home } from "lucide-react";
+import { Heart, LogIn, Loader2, Key } from "lucide-react";
 import { Property } from "@/types";
 import { RentConfirmationDialog } from "@/components/properties/RentConfirmationDialog";
 import { useState } from "react";
@@ -87,7 +87,7 @@ export const BookingCard = ({
             className="w-full rounded-full"
             size="lg"
           >
-            <Home className="mr-2 h-4 w-4" />
+            <Key className="mr-2 h-4 w-4" />
             Rent This Property
           </Button>
         </div>
@@ -101,7 +101,7 @@ export const BookingCard = ({
             variant="outline"
             className="w-full rounded-full opacity-60"
           >
-            <Home className="mr-2 h-4 w-4" />
+            <Key className="mr-2 h-4 w-4" />
             Currently Rented
           </Button>
         </div>

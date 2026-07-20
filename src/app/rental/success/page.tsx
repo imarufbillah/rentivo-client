@@ -32,7 +32,7 @@ const RentalSuccessPage = ({ searchParams }: { searchParams: Promise<{ session_i
 
   if (error) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-6 text-center">
         <div className="rounded-full bg-destructive/10 p-4">
           <AlertCircle className="h-12 w-12 text-destructive" />
         </div>
@@ -59,7 +59,7 @@ const RentalSuccessPage = ({ searchParams }: { searchParams: Promise<{ session_i
   }
 
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-6 text-center">
       <div className="rounded-full bg-success/10 p-4">
         {confirmRental.isPending ? (
           <Loader2 className="h-12 w-12 text-primary animate-spin" />

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 const ContactPage = () => {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-dvh mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="text-center">
         <h1 className="font-display text-4xl font-bold tracking-tight text-balance">
           Contact Us

@@ -23,7 +23,7 @@ const RentalCancelPage = ({ searchParams }: { searchParams: Promise<{ property_i
 
   if (error) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-6 text-center">
         <div className="rounded-full bg-destructive/10 p-4">
           <AlertCircle className="h-12 w-12 text-destructive" />
         </div>
@@ -53,7 +53,7 @@ const RentalCancelPage = ({ searchParams }: { searchParams: Promise<{ property_i
   }
 
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-6 text-center">
       <div className="rounded-full bg-destructive/10 p-4">
         {cancelPending.isPending ? (
           <Loader2 className="h-12 w-12 text-destructive animate-spin" />

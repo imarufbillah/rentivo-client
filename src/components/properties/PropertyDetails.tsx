@@ -145,7 +145,7 @@ export const PropertyDetails = ({
   }, [goToPrev, goToNext]);
 
   return (
-    <div className="mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-dvh mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
       <nav className="text-sm text-muted-foreground" aria-label="Breadcrumb">
         <ol className="flex items-center gap-1.5">
@@ -250,18 +250,6 @@ export const PropertyDetails = ({
 
           {/* Description */}
           <ListingMeta property={property} />
-        </div>
-
-        {/* Right: Sidebar — uses shared BookingCard */}
-        <div className="space-y-5 lg:sticky lg:top-24 lg:self-start">
-          <BookingCard
-            property={property}
-            isSaved={interactionState === "saved"}
-            isOwner={isOwner}
-            isAuthenticated={!!session}
-            isSaving={isSaving}
-            onSaveToggle={handleSaveToggle}
-          />
 
           {/* Info grid */}
           <PropertyInfoGrid property={property} />
@@ -284,6 +272,18 @@ export const PropertyDetails = ({
               </div>
             </div>
           )}
+        </div>
+
+        {/* Right: Sidebar — uses shared BookingCard */}
+        <div className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+          <BookingCard
+            property={property}
+            isSaved={interactionState === "saved"}
+            isOwner={isOwner}
+            isAuthenticated={!!session}
+            isSaving={isSaving}
+            onSaveToggle={handleSaveToggle}
+          />
 
           <PricingSection property={property} />
           <PolicySection property={property} />

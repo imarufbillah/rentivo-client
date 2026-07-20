@@ -7,6 +7,7 @@ import { RecommendationFeed } from "@/components/recommendations/RecommendationF
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/useAuth";
 import { useMyProperties } from "@/hooks/useProperties";
+import { PropertyWithStats } from "@/types";
 import { useSavedProperties } from "@/hooks/useInteractions";
 import { useMyRentals } from "@/hooks/useRentals";
 import {
@@ -19,7 +20,17 @@ import {
   Star,
   ArrowRight,
   Key,
+  BarChart3,
 } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
 const RenterDashboard = ({ userName }: { userName: string }) => {
   const { data: savedData } = useSavedProperties();
@@ -153,6 +164,12 @@ const OwnerDashboard = ({ userName }: { userName: string }) => {
         properties.length
       : 0;
 
+  const chartData = properties.map((p: PropertyWithStats) => ({
+    name: p.title.length > 15 ? p.title.slice(0, 15) + "..." : p.title,
+    views: p.viewCount,
+    saves: p.saveCount,
+  }));
+
   return (
     <div className="space-y-8">
       {/* Welcome */}
@@ -220,6 +237,36 @@ const OwnerDashboard = ({ userName }: { userName: string }) => {
           </Button>
         </Link>
       </div>
+
+      {/* Performance chart */}
+      {chartData.length > 0 && (
+        <div className="rounded-2xl border bg-card p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            <h2 className="font-display text-sm font-bold">Property Performance</h2>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData}>
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
+              <Tooltip />
+              <Legend />
+              <Bar
+                dataKey="views"
+                fill="var(--chart-1)"
+                name="Views"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="saves"
+                fill="var(--chart-3)"
+                name="Saves"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* Recent properties */}
       {properties.length > 0 && (
@@ -301,7 +348,7 @@ const DashboardPage = () => {
 
   return (
     <ProtectedRoute>
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="min-h-dvh mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {isOwner ? (
           <OwnerDashboard userName={userName} />
         ) : (

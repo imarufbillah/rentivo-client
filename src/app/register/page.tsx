@@ -17,7 +17,7 @@ const RegisterPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="flex min-h-dvh items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
@@ -26,7 +26,7 @@ const RegisterPage = () => {
   if (session) return null;
 
   return (
-    <div className="flex min-h-[60vh] items-center justify-center px-4">
+    <div className="flex min-h-dvh items-center justify-center px-4">
       <RegisterForm />
     </div>
   );

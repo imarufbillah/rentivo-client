@@ -180,7 +180,7 @@ const PropertiesPage = () => {
   const hasActiveFilters = chips.length > 0 || filters.search;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-dvh mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-6">
         <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">

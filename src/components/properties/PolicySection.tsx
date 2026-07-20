@@ -47,8 +47,8 @@ export const PolicySection = ({ property }: PolicySectionProps) => {
   if (activePolicies.length === 0) return null;
 
   return (
-    <div className="rounded-xl border p-4">
-      <h3 className="mb-3 font-semibold">Policies & Status</h3>
+    <div className="rounded-2xl border bg-card p-5">
+      <h3 className="mb-3 font-display text-sm font-bold">Policies & Status</h3>
       <div className="space-y-3">
         {activePolicies.map(({ icon: Icon, label, value }) => (
           <div key={label} className="flex items-center justify-between">

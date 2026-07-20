@@ -1,6 +1,8 @@
+import Link from "next/link";
+
 const PrivacyPage = () => {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-dvh mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
       <h1 className="font-display text-4xl font-bold tracking-tight">
         Privacy Policy
       </h1>
@@ -91,9 +93,9 @@ const PrivacyPage = () => {
           <p>
             If you have any questions about this Privacy Policy, please
             contact us at support@rentivo.com or visit our{" "}
-            <a href="/contact" className="text-primary underline">
+            <Link href="/contact" className="text-primary underline">
               Contact page
-            </a>
+            </Link>
             .
           </p>
         </section>

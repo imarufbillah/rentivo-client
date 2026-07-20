@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useLogin } from "@/hooks/useAuth";
 import { authClient } from "@/lib/auth-client";
 import { Mail, Lock, AlertCircle, Loader2 } from "lucide-react";
@@ -91,57 +95,46 @@ export const LoginForm = () => {
         )}
 
         <div className="space-y-2">
-          <label
-            htmlFor="email"
-            className="text-sm font-medium text-foreground"
-          >
-            Email
-          </label>
+          <Label htmlFor="email">Email</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
+            <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-xl border bg-card py-2.5 pl-10 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="rounded-xl pl-10"
               autoComplete="email"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-foreground"
-          >
-            Password
-          </label>
+          <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
+            <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-xl border bg-card py-2.5 pl-10 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="rounded-xl pl-10"
               autoComplete="current-password"
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              className="rounded border-border"
-            />
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="remember"
+            checked={rememberMe}
+            onCheckedChange={(checked) => setRememberMe(checked === true)}
+          />
+          <Label htmlFor="remember" className="text-sm text-muted-foreground">
             Remember me
-          </label>
+          </Label>
         </div>
 
         <Button
@@ -187,9 +180,9 @@ export const LoginForm = () => {
 
       <p className="text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}
-        <a href="/register" className="font-medium text-primary hover:underline">
+        <Link href="/register" className="font-medium text-primary hover:underline">
           Sign up
-        </a>
+        </Link>
       </p>
     </div>
   );

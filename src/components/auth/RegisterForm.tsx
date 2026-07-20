@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useRegister } from "@/hooks/useAuth";
 import { authClient } from "@/lib/auth-client";
 import { Mail, Lock, User, AlertCircle, Loader2 } from "lucide-react";
@@ -81,42 +84,32 @@ export const RegisterForm = () => {
         )}
 
         <div className="space-y-2">
-          <label
-            htmlFor="name"
-            className="text-sm font-medium text-foreground"
-          >
-            Name
-          </label>
+          <Label htmlFor="name">Name</Label>
           <div className="relative">
             <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
+            <Input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
-              className="w-full rounded-xl border bg-card py-2.5 pl-10 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="rounded-xl pl-10"
               autoComplete="name"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <label
-            htmlFor="email"
-            className="text-sm font-medium text-foreground"
-          >
-            Email
-          </label>
+          <Label htmlFor="email">Email</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
+            <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-xl border bg-card py-2.5 pl-10 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="rounded-xl pl-10"
               autoComplete="email"
               required
             />
@@ -124,21 +117,16 @@ export const RegisterForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-foreground"
-          >
-            Password
-          </label>
+          <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
+            <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-xl border bg-card py-2.5 pl-10 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="rounded-xl pl-10"
               autoComplete="new-password"
               required
             />
@@ -146,21 +134,16 @@ export const RegisterForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label
-            htmlFor="confirmPassword"
-            className="text-sm font-medium text-foreground"
-          >
-            Confirm Password
-          </label>
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
+            <Input
               id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-xl border bg-card py-2.5 pl-10 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="rounded-xl pl-10"
               autoComplete="new-password"
               required
             />
@@ -200,9 +183,9 @@ export const RegisterForm = () => {
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <a href="/login" className="font-medium text-primary hover:underline">
+        <Link href="/login" className="font-medium text-primary hover:underline">
           Sign in
-        </a>
+        </Link>
       </p>
     </div>
   );

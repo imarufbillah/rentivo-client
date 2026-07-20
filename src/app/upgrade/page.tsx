@@ -27,7 +27,7 @@ const UpgradePage = () => {
   return (
     <ProtectedRoute>
       <RoleGuard allowedRole="renter">
-        <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
+        <div className="flex min-h-dvh flex-col items-center justify-center px-4 text-center">
           <div className="max-w-md space-y-6">
             <div className="flex justify-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">

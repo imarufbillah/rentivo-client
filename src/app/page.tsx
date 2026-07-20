@@ -10,7 +10,7 @@ import { CTASection } from "@/components/home/CTASection";
 
 const HomePage = () => {
   return (
-    <div>
+    <div className="min-h-dvh">
       <HeroSection />
       <StatsBar />
       <HowItWorks />
