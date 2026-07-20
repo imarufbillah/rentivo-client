@@ -6,7 +6,8 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { PropertyManagementTable } from "@/components/properties/PropertyManagementTable";
 import { useMyProperties } from "@/hooks/useProperties";
-import { Eye, Heart, Star, Home, Plus } from "lucide-react";
+import { PropertyWithStats } from "@/types";
+import { Eye, Heart, Star, Home, Plus, BarChart3 } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -26,9 +27,8 @@ const SummaryCards = () => {
       views: acc.views + p.viewCount,
       saves: acc.saves + p.saveCount,
       reviews: acc.reviews + p.totalReviews,
-      properties: acc.properties + 1,
     }),
-    { views: 0, saves: 0, reviews: 0, properties: 0 }
+    { views: 0, saves: 0, reviews: 0 }
   );
 
   const avgRating =
@@ -38,7 +38,7 @@ const SummaryCards = () => {
       : 0;
 
   const cards = [
-    { label: "Properties", value: totals.properties, icon: Home },
+    { label: "Properties", value: properties.length, icon: Home },
     { label: "Total Views", value: totals.views, icon: Eye },
     { label: "Total Saves", value: totals.saves, icon: Heart },
     {
@@ -51,12 +51,17 @@ const SummaryCards = () => {
   return (
     <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
       {cards.map((card) => (
-        <div key={card.label} className="rounded-2xl border bg-card p-4">
+        <div
+          key={card.label}
+          className="rounded-2xl border bg-card p-4 transition-colors hover:bg-muted/20"
+        >
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <card.icon className="h-4 w-4" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
+              <card.icon className="h-3.5 w-3.5 text-primary" />
+            </div>
             {card.label}
           </div>
-          <p className="mt-2 font-display text-2xl font-bold text-foreground">
+          <p className="mt-2.5 font-display text-2xl font-bold text-foreground">
             {card.value}
           </p>
         </div>
@@ -71,7 +76,7 @@ const PropertyChart = () => {
 
   if (properties.length === 0) return null;
 
-  const chartData = properties.map((p: any) => ({
+  const chartData = properties.map((p: PropertyWithStats) => ({
     name: p.title.length > 15 ? p.title.slice(0, 15) + "..." : p.title,
     views: p.viewCount,
     saves: p.saveCount,
@@ -79,9 +84,10 @@ const PropertyChart = () => {
 
   return (
     <div className="mb-8 rounded-2xl border bg-card p-5">
-      <h2 className="mb-4 font-display text-sm font-bold">
-        Property Performance
-      </h2>
+      <div className="mb-4 flex items-center gap-2">
+        <BarChart3 className="h-4 w-4 text-muted-foreground" />
+        <h2 className="font-display text-sm font-bold">Property Performance</h2>
+      </div>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData}>
           <XAxis dataKey="name" tick={{ fontSize: 12 }} />
@@ -117,7 +123,7 @@ const ManagePropertiesPage = () => {
                 My Properties
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Manage your property listings
+                Manage your property listings and track performance
               </p>
             </div>
             <Link href="/properties/add">
