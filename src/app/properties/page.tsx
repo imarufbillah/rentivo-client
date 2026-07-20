@@ -9,6 +9,11 @@ import {
 } from "@/components/properties/PropertyFilters";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import { useProperties } from "@/hooks/useProperties";
 import { getErrorMessage } from "@/lib/api/error";
 import { AlertCircle, SlidersHorizontal, X } from "lucide-react";
@@ -221,13 +226,20 @@ const PropertiesPage = () => {
               className="gap-1 rounded-full pr-1"
             >
               {chip.label}
-              <button
-                onClick={() => handleRemoveChip(chip)}
-                className="ml-1 rounded-full p-0.5 hover:bg-muted"
-                aria-label={`Remove ${chip.label} filter`}
-              >
-                <X className="h-3 w-3" />
-              </button>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <button
+                      onClick={() => handleRemoveChip(chip)}
+                      className="ml-1 rounded-full p-0.5 hover:bg-muted"
+                      aria-label={`Remove ${chip.label} filter`}
+                    />
+                  }
+                >
+                  <X className="h-3 w-3" />
+                </TooltipTrigger>
+                <TooltipContent>Remove filter</TooltipContent>
+              </Tooltip>
             </Badge>
           ))}
           <Button
@@ -243,7 +255,7 @@ const PropertiesPage = () => {
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         {/* Sidebar — desktop always, mobile conditional */}
-        <aside className={`${mobileFiltersOpen ? "block" : "hidden"} lg:block`}>
+        <aside className={`${mobileFiltersOpen ? "block" : "hidden"} lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto`}>
           <PropertyFilters
             onFilterChange={handleFilterChange}
             initialFilters={filters}
@@ -278,13 +290,20 @@ const PropertiesPage = () => {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="mt-8 flex items-center justify-center gap-2">
-              <button
-                onClick={() => handlePageChange(Math.max(1, page - 1))}
-                disabled={page <= 1}
-                className="rounded-xl border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Previous
-              </button>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <button
+                      onClick={() => handlePageChange(Math.max(1, page - 1))}
+                      disabled={page <= 1}
+                      className="rounded-xl border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  }
+                >
+                  Previous
+                </TooltipTrigger>
+                <TooltipContent>Previous page</TooltipContent>
+              </Tooltip>
 
               {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
                 let pageNum: number;
@@ -312,13 +331,20 @@ const PropertiesPage = () => {
                 );
               })}
 
-              <button
-                onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
-                disabled={page >= totalPages}
-                className="rounded-xl border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-              </button>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <button
+                      onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
+                      disabled={page >= totalPages}
+                      className="rounded-xl border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  }
+                >
+                  Next
+                </TooltipTrigger>
+                <TooltipContent>Next page</TooltipContent>
+              </Tooltip>
             </div>
           )}
         </section>
