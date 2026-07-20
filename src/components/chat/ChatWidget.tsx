@@ -78,9 +78,10 @@ export const ChatWidget = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // Lock body scroll on mobile when open
+  // Lock body scroll only on mobile when chat overlay is open
   useEffect(() => {
-    if (isOpen) {
+    const isMobile = window.matchMedia("(max-width: 1023px)").matches;
+    if (isOpen && isMobile) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
