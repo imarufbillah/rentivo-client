@@ -40,7 +40,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <ThemeClient>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider delay={2000}>
+        <TooltipProvider delay={300}>
           {children}
         </TooltipProvider>
         <Toaster richColors position="bottom-right" />
