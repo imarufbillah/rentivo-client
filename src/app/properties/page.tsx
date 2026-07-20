@@ -17,7 +17,6 @@ import {
 import { useProperties } from "@/hooks/useProperties";
 import { getErrorMessage } from "@/lib/api/error";
 import { AlertCircle, SlidersHorizontal, X } from "lucide-react";
-import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 
 const defaultFilters: FilterState = {
   search: "",
@@ -187,7 +186,6 @@ const PropertiesPage = () => {
 
   return (
     <div className="min-h-dvh mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <AppBreadcrumb segments={[{ label: "Properties" }]} />
       <div className="mb-6">
         <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
           Find Your Perfect Property
