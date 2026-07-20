@@ -5,6 +5,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { PropertyForm } from "@/components/properties/PropertyForm";
 import { useCreateProperty } from "@/hooks/useProperties";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 
 const AddPropertyPage = () => {
   const router = useRouter();
@@ -24,6 +25,7 @@ const AddPropertyPage = () => {
     <ProtectedRoute>
       <RoleGuard allowedRole="owner">
         <div className="min-h-dvh mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+          <AppBreadcrumb segments={[{ label: "Properties", href: "/properties" }, { label: "Add Property" }]} />
           <div className="mb-8">
             <h1 className="font-display text-2xl font-bold">
               Add New Property

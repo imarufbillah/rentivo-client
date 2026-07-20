@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "@/hooks/useAuth";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -28,7 +29,8 @@ const LoginPage = () => {
   if (session) return null;
 
   return (
-    <div className="flex min-h-dvh items-center justify-center px-4">
+    <div className="flex min-h-dvh flex-col items-center justify-center px-4">
+      <AppBreadcrumb segments={[{ label: "Sign In" }]} />
       <LoginForm />
     </div>
   );

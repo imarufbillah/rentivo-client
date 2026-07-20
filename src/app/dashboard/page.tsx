@@ -22,6 +22,7 @@ import {
   Key,
   BarChart3,
 } from "lucide-react";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 import {
   BarChart,
   Bar,
@@ -349,7 +350,7 @@ const DashboardPage = () => {
   return (
     <ProtectedRoute>
       <div className="min-h-dvh mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        {isOwner ? (
+        <AppBreadcrumb segments={[{ label: "Dashboard" }]} />        {isOwner ? (
           <OwnerDashboard userName={userName} />
         ) : (
           <RenterDashboard userName={userName} />

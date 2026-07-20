@@ -10,6 +10,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 import { PropertyCard } from "./PropertyCard";
 import { BookingCard } from "./BookingCard";
 import { ListingMeta } from "./ListingMeta";
@@ -151,28 +152,12 @@ export const PropertyDetails = ({
 
   return (
     <div className="min-h-dvh mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-6 lg:px-8">
-      {/* Breadcrumb */}
-      <nav className="text-sm text-muted-foreground" aria-label="Breadcrumb">
-        <ol className="flex items-center gap-1.5">
-          <li>
-            <Link href="/" className="hover:text-foreground transition-colors">
-              Home
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href="/properties" className="hover:text-foreground transition-colors">
-              Properties
-            </Link>
-          </li>
-          {property.location && (
-            <>
-              <li aria-hidden="true">/</li>
-              <li className="truncate max-w-[150px]">{property.location}</li>
-            </>
-          )}
-        </ol>
-      </nav>
+      <AppBreadcrumb
+        segments={[
+          { label: "Properties", href: "/properties" },
+          { label: property.location || property.title },
+        ]}
+      />
 
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Left: Gallery + Description */}

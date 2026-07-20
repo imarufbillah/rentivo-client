@@ -7,6 +7,7 @@ import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
 import { useUpgradeToOwner } from "@/hooks/useAuth";
 import { Home, Loader2, ArrowRight } from "lucide-react";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 
 const UpgradePage = () => {
   const upgradeMutation = useUpgradeToOwner();
@@ -28,6 +29,7 @@ const UpgradePage = () => {
     <ProtectedRoute>
       <RoleGuard allowedRole="renter">
         <div className="flex min-h-dvh flex-col items-center justify-center px-4 text-center">
+          <AppBreadcrumb segments={[{ label: "Upgrade" }]} />
           <div className="max-w-md space-y-6">
             <div className="flex justify-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">

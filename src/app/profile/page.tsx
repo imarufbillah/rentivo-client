@@ -3,6 +3,7 @@
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { useSession } from "@/hooks/useAuth";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 
 const ProfilePage = () => {
   const { data: session } = useSession();
@@ -14,6 +15,7 @@ const ProfilePage = () => {
   return (
     <ProtectedRoute>
       <div className="min-h-dvh mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+        <AppBreadcrumb segments={[{ label: "Profile" }]} />
         <div className="mb-8">
           <h1 className="font-display text-2xl font-bold">Profile</h1>
           <p className="mt-1 text-sm text-muted-foreground">

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Eye, Heart, Key, Trash2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 
 const tabs = [
   { value: "saved", label: "Saved", icon: Heart },
@@ -83,6 +84,7 @@ const HistoryPage = () => {
   return (
     <ProtectedRoute>
       <div className="min-h-dvh mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <AppBreadcrumb segments={[{ label: "History" }]} />
         <div className="mb-6">
           <h1 className="font-display text-2xl font-bold">History</h1>
           <p className="mt-1 text-sm text-muted-foreground">

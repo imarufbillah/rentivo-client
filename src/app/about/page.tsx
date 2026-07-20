@@ -1,8 +1,10 @@
 import { Brain, Users, Shield, Rocket } from "lucide-react";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 
 const AboutPage = () => {
   return (
     <div className="min-h-dvh mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+      <AppBreadcrumb segments={[{ label: "About" }]} />
       <div className="text-center">
         <h1 className="font-display text-4xl font-bold tracking-tight text-balance">
           About Rentivo

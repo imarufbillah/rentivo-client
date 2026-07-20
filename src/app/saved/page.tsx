@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Bookmark, Loader2, Heart, MapPin, BedDouble, Bath, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Property } from "@/types";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 
 const SavedPropertyCard = ({ property }: { property: Property }) => {
   const deleteInteraction = useDeleteInteraction();
@@ -109,6 +110,7 @@ const SavedPropertiesPage = () => {
   return (
     <ProtectedRoute>
       <div className="min-h-dvh mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <AppBreadcrumb segments={[{ label: "Saved Properties" }]} />
         <div className="mb-8">
           <h1 className="font-display text-2xl font-bold">Saved Properties</h1>
           <p className="mt-1 text-sm text-muted-foreground">

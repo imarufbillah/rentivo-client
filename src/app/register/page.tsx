@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/hooks/useAuth";
 import { RegisterForm } from "@/components/auth/RegisterForm";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -26,7 +27,8 @@ const RegisterPage = () => {
   if (session) return null;
 
   return (
-    <div className="flex min-h-dvh items-center justify-center px-4">
+    <div className="flex min-h-dvh flex-col items-center justify-center px-4">
+      <AppBreadcrumb segments={[{ label: "Sign Up" }]} />
       <RegisterForm />
     </div>
   );

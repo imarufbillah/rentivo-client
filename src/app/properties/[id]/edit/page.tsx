@@ -7,6 +7,7 @@ import { RoleGuard } from "@/components/auth/RoleGuard";
 import { PropertyForm } from "@/components/properties/PropertyForm";
 import { useProperty, useUpdateProperty } from "@/hooks/useProperties";
 import { AlertTriangle } from "lucide-react";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 
 const EditPropertyPage = () => {
   const params = useParams();
@@ -78,6 +79,7 @@ const EditPropertyPage = () => {
     <ProtectedRoute>
       <RoleGuard allowedRole="owner">
         <div className="min-h-dvh mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+          <AppBreadcrumb segments={[{ label: "Properties", href: "/properties" }, { label: "Edit" }]} />
           <div className="mb-8">
             <h1 className="font-display text-2xl font-bold">Edit Property</h1>
             <p className="mt-1 text-sm text-muted-foreground">

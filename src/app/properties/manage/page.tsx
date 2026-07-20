@@ -8,6 +8,7 @@ import { PropertyManagementTable } from "@/components/properties/PropertyManagem
 import { useMyProperties } from "@/hooks/useProperties";
 import { PropertyWithStats } from "@/types";
 import { Eye, Heart, Star, Home, Plus, BarChart3 } from "lucide-react";
+import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
 import {
   BarChart,
   Bar,
@@ -117,6 +118,7 @@ const ManagePropertiesPage = () => {
     <ProtectedRoute>
       <RoleGuard allowedRole="owner">
         <div className="min-h-dvh mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+          <AppBreadcrumb segments={[{ label: "Properties", href: "/properties" }, { label: "My Properties" }]} />
           <div className="mb-8 flex items-center justify-between">
             <div>
               <h1 className="font-display text-2xl font-bold">
