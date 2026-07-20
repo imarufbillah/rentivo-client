@@ -46,7 +46,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <Navbar />
-          <main className="flex-1">
+          <main className="flex-1 pt-20">
             <ErrorBoundary>{children}</ErrorBoundary>
           </main>
           <Footer />

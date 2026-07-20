@@ -35,9 +35,8 @@ export const CTASection = () => {
             </Link>
             <Link href="/register">
               <Button
-                variant="outline"
                 size="lg"
-                className="w-full rounded-full border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary sm:w-auto"
+                className="w-full rounded-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 sm:w-auto"
               >
                 Get Started Free
               </Button>

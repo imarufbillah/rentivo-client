@@ -1,10 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Property,
   FurnishingStatus,
@@ -113,9 +124,6 @@ const rentFrequencyOptions: { value: RentFrequency; label: string }[] = [
   { value: "daily", label: "Daily" },
 ];
 
-const inputClass =
-  "w-full rounded-xl border bg-card py-2.5 px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20";
-
 const steps = [
   { label: "Basics", fields: ["title", "shortDescription", "description", "propertyType", "status", "location", "fullAddress"] },
   { label: "Details", fields: ["bedrooms", "bathrooms", "size", "balconies", "floor", "totalFloors", "furnishing", "condition", "parking", "internet"] },
@@ -134,6 +142,7 @@ export const PropertyForm = ({
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(
     initialData?.amenities || []
   );
+  const isSubmitClicked = useRef(false);
   const { data: amenitiesData } = useAmenities();
   const amenitiesList = (amenitiesData?.amenities || []).map((a) => ({
     value: a,
@@ -186,6 +195,14 @@ export const PropertyForm = ({
   });
 
   const internetChecked = watch("internet");
+  const propertyTypeValue = watch("propertyType");
+  const statusValue = watch("status");
+  const furnishingValue = watch("furnishing");
+  const conditionValue = watch("condition");
+  const parkingValue = watch("parking");
+  const rentFrequencyValue = watch("rentFrequency");
+  const petPolicyValue = watch("petPolicy");
+  const smokingPolicyValue = watch("smokingPolicy");
 
   const handleImagesChange = (newImages: string[]) => {
     setImages(newImages);
@@ -211,6 +228,7 @@ export const PropertyForm = ({
   };
 
   const onFormSubmit = (data: PropertyFormData) => {
+    if (!isSubmitClicked.current) return;
     onSubmit({
       ...data,
       price: Number(data.price),
@@ -289,19 +307,23 @@ export const PropertyForm = ({
         </ol>
       </nav>
 
-      <form onSubmit={handleSubmit(onFormSubmit)} noValidate>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(onFormSubmit)(e);
+        }}
+        noValidate
+      >
         {/* Step 0: Basics */}
         {step === 0 && (
           <div className="space-y-5">
             <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium text-foreground">
-                Title *
-              </label>
-              <input
+              <Label htmlFor="title">Title *</Label>
+              <Input
                 id="title"
                 {...register("title")}
                 placeholder="Cozy apartment downtown"
-                className={inputClass}
+                className="rounded-xl"
                 aria-invalid={!!errors.title}
               />
               {errors.title && (
@@ -312,33 +334,23 @@ export const PropertyForm = ({
             </div>
 
             <div className="space-y-2">
-              <label
-                htmlFor="shortDescription"
-                className="text-sm font-medium text-foreground"
-              >
-                Short Description
-              </label>
-              <input
+              <Label htmlFor="shortDescription">Short Description</Label>
+              <Input
                 id="shortDescription"
                 {...register("shortDescription")}
                 placeholder="Brief one-liner about your property"
                 maxLength={200}
-                className={inputClass}
+                className="rounded-xl"
               />
             </div>
 
             <div className="space-y-2">
-              <label
-                htmlFor="description"
-                className="text-sm font-medium text-foreground"
-              >
-                Description *
-              </label>
-              <textarea
+              <Label htmlFor="description">Description *</Label>
+              <Textarea
                 id="description"
                 {...register("description")}
                 rows={4}
-                className={inputClass}
+                className="rounded-xl"
                 placeholder="Describe your property in detail..."
                 aria-invalid={!!errors.description}
               />
@@ -351,58 +363,51 @@ export const PropertyForm = ({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="propertyType"
-                  className="text-sm font-medium text-foreground"
+                <Label>Property Type *</Label>
+                <Select
+                  value={propertyTypeValue}
+                  onValueChange={(v) => v && setValue("propertyType", v as PropertyFormData["propertyType"])}
                 >
-                  Property Type *
-                </label>
-                <select
-                  id="propertyType"
-                  {...register("propertyType")}
-                  className={inputClass}
-                >
-                  {propertyTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="rounded-xl" aria-label="Property type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {propertyTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="status"
-                  className="text-sm font-medium text-foreground"
+                <Label>Status</Label>
+                <Select
+                  value={statusValue}
+                  onValueChange={(v) => v && setValue("status", v as PropertyFormData["status"])}
                 >
-                  Status
-                </label>
-                <select
-                  id="status"
-                  {...register("status")}
-                  className={inputClass}
-                >
-                  {propertyStatuses.map((s) => (
-                    <option key={s} value={s}>
-                      {s.charAt(0).toUpperCase() + s.slice(1)}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="rounded-xl" aria-label="Status">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {propertyStatuses.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s.charAt(0).toUpperCase() + s.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="location"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Location *
-                </label>
-                <input
+                <Label htmlFor="location">Location *</Label>
+                <Input
                   id="location"
                   {...register("location")}
                   placeholder="New York"
-                  className={inputClass}
+                  className="rounded-xl"
                   aria-invalid={!!errors.location}
                 />
                 {errors.location && (
@@ -412,17 +417,12 @@ export const PropertyForm = ({
                 )}
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="fullAddress"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Full Address
-                </label>
-                <input
+                <Label htmlFor="fullAddress">Full Address</Label>
+                <Input
                   id="fullAddress"
                   {...register("fullAddress")}
                   placeholder="123 Main St, Apt 4B"
-                  className={inputClass}
+                  className="rounded-xl"
                 />
               </div>
             </div>
@@ -434,18 +434,13 @@ export const PropertyForm = ({
           <div className="space-y-5">
             <div className="grid grid-cols-4 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="bedrooms"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Bedrooms *
-                </label>
-                <input
+                <Label htmlFor="bedrooms">Bedrooms *</Label>
+                <Input
                   id="bedrooms"
                   type="number"
                   {...register("bedrooms")}
                   min="0"
-                  className={inputClass}
+                  className="rounded-xl"
                 />
                 {errors.bedrooms && (
                   <p role="alert" className="text-sm text-destructive">
@@ -454,18 +449,13 @@ export const PropertyForm = ({
                 )}
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="bathrooms"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Bathrooms *
-                </label>
-                <input
+                <Label htmlFor="bathrooms">Bathrooms *</Label>
+                <Input
                   id="bathrooms"
                   type="number"
                   {...register("bathrooms")}
                   min="0"
-                  className={inputClass}
+                  className="rounded-xl"
                 />
                 {errors.bathrooms && (
                   <p role="alert" className="text-sm text-destructive">
@@ -474,148 +464,115 @@ export const PropertyForm = ({
                 )}
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="size"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Size (sqft)
-                </label>
-                <input
+                <Label htmlFor="size">Size (sqft)</Label>
+                <Input
                   id="size"
                   type="number"
                   {...register("size")}
                   placeholder="0"
-                  className={inputClass}
+                  className="rounded-xl"
                 />
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="balconies"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Balconies
-                </label>
-                <input
+                <Label htmlFor="balconies">Balconies</Label>
+                <Input
                   id="balconies"
                   type="number"
                   {...register("balconies")}
                   placeholder="0"
-                  className={inputClass}
+                  className="rounded-xl"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="floor"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Floor
-                </label>
-                <input
+                <Label htmlFor="floor">Floor</Label>
+                <Input
                   id="floor"
                   type="number"
                   {...register("floor")}
                   placeholder="0"
-                  className={inputClass}
+                  className="rounded-xl"
                 />
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="totalFloors"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Total Floors
-                </label>
-                <input
+                <Label htmlFor="totalFloors">Total Floors</Label>
+                <Input
                   id="totalFloors"
                   type="number"
                   {...register("totalFloors")}
                   placeholder="0"
-                  className={inputClass}
+                  className="rounded-xl"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="furnishing"
-                  className="text-sm font-medium text-foreground"
+                <Label>Furnishing</Label>
+                <Select
+                  value={furnishingValue || ""}
+                  onValueChange={(v) => setValue("furnishing", (v || undefined) as PropertyFormData["furnishing"])}
                 >
-                  Furnishing
-                </label>
-                <select
-                  id="furnishing"
-                  {...register("furnishing")}
-                  className={inputClass}
-                >
-                  <option value="">Select...</option>
-                  {furnishingOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="rounded-xl" aria-label="Furnishing">
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {furnishingOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="condition"
-                  className="text-sm font-medium text-foreground"
+                <Label>Condition</Label>
+                <Select
+                  value={conditionValue || ""}
+                  onValueChange={(v) => setValue("condition", (v || undefined) as PropertyFormData["condition"])}
                 >
-                  Condition
-                </label>
-                <select
-                  id="condition"
-                  {...register("condition")}
-                  className={inputClass}
-                >
-                  <option value="">Select...</option>
-                  {conditionOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="rounded-xl" aria-label="Condition">
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {conditionOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="parking"
-                  className="text-sm font-medium text-foreground"
+                <Label>Parking</Label>
+                <Select
+                  value={parkingValue || ""}
+                  onValueChange={(v) => setValue("parking", (v || undefined) as PropertyFormData["parking"])}
                 >
-                  Parking
-                </label>
-                <select
-                  id="parking"
-                  {...register("parking")}
-                  className={inputClass}
-                >
-                  <option value="">Select...</option>
-                  {parkingOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="rounded-xl" aria-label="Parking">
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {parkingOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex items-center gap-3 pt-6">
-                <input
+                <Checkbox
                   id="internet"
-                  type="checkbox"
-                  {...register("internet")}
                   checked={internetChecked}
-                  className="rounded"
+                  onCheckedChange={(checked) => setValue("internet", checked === true)}
                 />
-                <label
-                  htmlFor="internet"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Internet Included
-                </label>
+                <Label htmlFor="internet">Internet Included</Label>
               </div>
             </div>
           </div>
@@ -626,18 +583,13 @@ export const PropertyForm = ({
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="price"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Price ($) *
-                </label>
-                <input
+                <Label htmlFor="price">Price ($) *</Label>
+                <Input
                   id="price"
                   type="number"
                   {...register("price")}
                   placeholder="1500"
-                  className={inputClass}
+                  className="rounded-xl"
                   aria-invalid={!!errors.price}
                 />
                 {errors.price && (
@@ -647,103 +599,76 @@ export const PropertyForm = ({
                 )}
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="rentFrequency"
-                  className="text-sm font-medium text-foreground"
+                <Label>Rent Frequency</Label>
+                <Select
+                  value={rentFrequencyValue || ""}
+                  onValueChange={(v) => setValue("rentFrequency", (v || undefined) as PropertyFormData["rentFrequency"])}
                 >
-                  Rent Frequency
-                </label>
-                <select
-                  id="rentFrequency"
-                  {...register("rentFrequency")}
-                  className={inputClass}
-                >
-                  <option value="">Select...</option>
-                  {rentFrequencyOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="rounded-xl" aria-label="Rent frequency">
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rentFrequencyOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="securityDeposit"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Security Deposit ($)
-                </label>
-                <input
+                <Label htmlFor="securityDeposit">Security Deposit ($)</Label>
+                <Input
                   id="securityDeposit"
                   type="number"
                   {...register("securityDeposit")}
                   placeholder="0"
-                  className={inputClass}
+                  className="rounded-xl"
                 />
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="advancePayment"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Advance Payment ($)
-                </label>
-                <input
+                <Label htmlFor="advancePayment">Advance Payment ($)</Label>
+                <Input
                   id="advancePayment"
                   type="number"
                   {...register("advancePayment")}
                   placeholder="0"
-                  className={inputClass}
+                  className="rounded-xl"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="leaseDuration"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Lease (months)
-                </label>
-                <input
+                <Label htmlFor="leaseDuration">Lease (months)</Label>
+                <Input
                   id="leaseDuration"
                   type="number"
                   {...register("leaseDuration")}
                   placeholder="12"
-                  className={inputClass}
+                  className="rounded-xl"
                 />
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="minStay"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Min Stay (months)
-                </label>
-                <input
+                <Label htmlFor="minStay">Min Stay (months)</Label>
+                <Input
                   id="minStay"
                   type="number"
                   {...register("minStay")}
                   placeholder="1"
-                  className={inputClass}
+                  className="rounded-xl"
                 />
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="availableFrom"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Available From
-                </label>
-                <input
+                <Label htmlFor="availableFrom">Available From</Label>
+                <Input
                   id="availableFrom"
                   type="date"
                   {...register("availableFrom")}
-                  className={inputClass}
+                  className="rounded-xl"
                 />
               </div>
             </div>
@@ -755,90 +680,71 @@ export const PropertyForm = ({
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="petPolicy"
-                  className="text-sm font-medium text-foreground"
+                <Label>Pet Policy</Label>
+                <Select
+                  value={petPolicyValue || ""}
+                  onValueChange={(v) => setValue("petPolicy", (v || undefined) as PropertyFormData["petPolicy"])}
                 >
-                  Pet Policy
-                </label>
-                <select
-                  id="petPolicy"
-                  {...register("petPolicy")}
-                  className={inputClass}
-                >
-                  <option value="">Select...</option>
-                  {petPolicyOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="rounded-xl" aria-label="Pet policy">
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {petPolicyOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
-                <label
-                  htmlFor="smokingPolicy"
-                  className="text-sm font-medium text-foreground"
+                <Label>Smoking Policy</Label>
+                <Select
+                  value={smokingPolicyValue || ""}
+                  onValueChange={(v) => setValue("smokingPolicy", (v || undefined) as PropertyFormData["smokingPolicy"])}
                 >
-                  Smoking Policy
-                </label>
-                <select
-                  id="smokingPolicy"
-                  {...register("smokingPolicy")}
-                  className={inputClass}
-                >
-                  <option value="">Select...</option>
-                  {smokingPolicyOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="rounded-xl" aria-label="Smoking policy">
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {smokingPolicyOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label
-                htmlFor="utilities"
-                className="text-sm font-medium text-foreground"
-              >
-                Utilities (comma-separated)
-              </label>
-              <input
+              <Label htmlFor="utilities">Utilities (comma-separated)</Label>
+              <Input
                 id="utilities"
                 {...register("utilities")}
                 placeholder="water, electricity, gas, internet"
-                className={inputClass}
+                className="rounded-xl"
               />
             </div>
 
             <div className="space-y-2">
-              <label
-                htmlFor="houseRules"
-                className="text-sm font-medium text-foreground"
-              >
-                House Rules
-              </label>
-              <textarea
+              <Label htmlFor="houseRules">House Rules</Label>
+              <Textarea
                 id="houseRules"
                 {...register("houseRules")}
                 rows={3}
-                className={inputClass}
+                className="rounded-xl"
                 placeholder="No smoking, quiet hours after 10pm..."
               />
             </div>
 
             <div className="space-y-2">
-              <label
-                htmlFor="rentalTerms"
-                className="text-sm font-medium text-foreground"
-              >
-                Rental Terms
-              </label>
-              <textarea
+              <Label htmlFor="rentalTerms">Rental Terms</Label>
+              <Textarea
                 id="rentalTerms"
                 {...register("rentalTerms")}
                 rows={3}
-                className={inputClass}
+                className="rounded-xl"
                 placeholder="Payment due on the 1st, late fee applies..."
               />
             </div>
@@ -848,7 +754,6 @@ export const PropertyForm = ({
         {/* Step 4: Amenities + Images */}
         {step === 4 && (
           <div className="space-y-6">
-            {/* Amenities */}
             <div>
               <h3 className="mb-3 text-sm font-medium text-foreground">
                 Amenities
@@ -875,7 +780,6 @@ export const PropertyForm = ({
               </div>
             </div>
 
-            {/* Images */}
             <div>
               <h3 className="mb-3 text-sm font-medium text-foreground">
                 Property Images *
@@ -920,6 +824,7 @@ export const PropertyForm = ({
               type="submit"
               className="rounded-full"
               disabled={isLoading}
+              onClick={() => { isSubmitClicked.current = true; }}
             >
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

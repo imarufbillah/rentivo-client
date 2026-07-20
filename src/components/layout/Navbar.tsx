@@ -115,7 +115,7 @@ export const Navbar = () => {
           scrolled ? "py-3" : "py-4"
         }`}
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
           <nav
             className={`mx-auto flex items-center justify-between px-6 py-3 transition-all duration-300 ${
               scrolled
