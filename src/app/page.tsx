@@ -2,6 +2,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { StatsBar } from "@/components/home/StatsBar";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { Features } from "@/components/home/Features";
+import { FeaturedProperties } from "@/components/home/FeaturedProperties";
 import { PropertyTypes } from "@/components/home/PropertyTypes";
 import { Testimonials } from "@/components/home/Testimonials";
 import { FAQ } from "@/components/home/FAQ";
@@ -13,6 +14,7 @@ const HomePage = () => {
       <HeroSection />
       <StatsBar />
       <HowItWorks />
+      <FeaturedProperties />
       <Features />
       <PropertyTypes />
       <Testimonials />

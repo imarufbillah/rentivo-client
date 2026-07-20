@@ -101,6 +101,20 @@ export const useRelatedProperties = (location: string, propertyType: string, exc
   });
 };
 
+export const useFeaturedProperties = () => {
+  return useQuery({
+    queryKey: ['properties', 'featured'],
+    queryFn: async () => {
+      const result = await apiClient.get<PaginatedResult<Property>>('/api/properties', {
+        sortBy: 'averageRating',
+        sortOrder: 'desc',
+        limit: 6,
+      });
+      return result.data.filter((p) => p.averageRating != null && p.averageRating > 0);
+    },
+  });
+};
+
 export const useAmenities = () => {
   return useQuery({
     queryKey: ['properties', 'amenities'],
