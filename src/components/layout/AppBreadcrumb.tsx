@@ -27,16 +27,16 @@ export const AppBreadcrumb = ({ segments }: AppBreadcrumbProps) => {
         <BreadcrumbSeparator />
         {segments.map((segment, i) => {
           const isLast = i === segments.length - 1;
-          return (
+          return [
             <BreadcrumbItem key={segment.href || segment.label}>
               {isLast || !segment.href ? (
                 <BreadcrumbPage>{segment.label}</BreadcrumbPage>
               ) : (
                 <BreadcrumbLink render={<Link href={segment.href}>{segment.label}</Link>} />
               )}
-              {!isLast && <BreadcrumbSeparator />}
-            </BreadcrumbItem>
-          );
+            </BreadcrumbItem>,
+            !isLast && <BreadcrumbSeparator key={`sep-${i}`} />,
+          ];
         })}
       </BreadcrumbList>
     </Breadcrumb>
