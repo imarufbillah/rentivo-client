@@ -12,6 +12,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAmenities } from "@/hooks/useProperties";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 
 interface PropertyFiltersProps {
@@ -182,15 +193,18 @@ export const PropertyFilters = ({
           <h3 className="font-display text-sm font-bold">Filters</h3>
         </div>
         {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearFilters}
-            className="h-8 rounded-full text-xs text-muted-foreground hover:text-foreground"
-          >
-            <X className="mr-1 h-3 w-3" />
-            Clear all
-          </Button>
+          <Tooltip>
+            <TooltipTrigger render={<Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="h-8 rounded-full text-xs text-muted-foreground hover:text-foreground"
+            />}>
+              <X className="mr-1 h-3 w-3" />
+              Clear all
+            </TooltipTrigger>
+            <TooltipContent>Remove all active filters</TooltipContent>
+          </Tooltip>
         )}
       </div>
 
@@ -333,33 +347,44 @@ export const PropertyFilters = ({
         </Select>
       </div>
 
-      {/* Amenities */}
+      {/* Amenities — collapsible */}
       {amenitiesList.length > 0 && (
-        <div>
-          <Label className="text-xs text-muted-foreground">Amenities</Label>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {amenitiesList.map((amenity) => {
-              const selected = filters.amenities
-                ?.split(",")
-                .includes(amenity.value);
-              return (
-                <button
-                  key={amenity.value}
-                  type="button"
-                  onClick={() => toggleAmenity(amenity.value)}
-                  aria-pressed={selected}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                    selected
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-input text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
-                >
-                  {amenity.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <Accordion defaultValue={["amenities"]}>
+          <AccordionItem value="amenities" className="border-none">
+            <AccordionTrigger className="py-1 text-xs text-muted-foreground hover:no-underline">
+              Amenities
+              {filters.amenities && (
+                <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                  {filters.amenities.split(",").filter(Boolean).length}
+                </span>
+              )}
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {amenitiesList.map((amenity) => {
+                  const selected = filters.amenities
+                    ?.split(",")
+                    .includes(amenity.value);
+                  return (
+                    <button
+                      key={amenity.value}
+                      type="button"
+                      onClick={() => toggleAmenity(amenity.value)}
+                      aria-pressed={selected}
+                      className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                        selected
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-input text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                    >
+                      {amenity.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       )}
 
       {/* Sort */}
