@@ -5,7 +5,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, LogOut, User, Settings, Home } from "lucide-react";
+import {
+  Menu,
+  X,
+  LogOut,
+  User,
+  Home,
+  Heart,
+  Clock,
+  Settings,
+  BarChart3,
+  Key,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { useSession } from "@/hooks/useAuth";
@@ -44,7 +55,6 @@ export const Navbar = () => {
     setProfileOpen(false);
   }, [pathname]);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -56,7 +66,6 @@ export const Navbar = () => {
     };
   }, [mobileMenuOpen]);
 
-  // Escape key to close mobile menu and profile dropdown
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -72,7 +81,6 @@ export const Navbar = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // Close profile dropdown when clicking outside
   useEffect(() => {
     if (!profileOpen) return;
     const handleClick = (e: MouseEvent) => {
@@ -85,16 +93,11 @@ export const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [profileOpen]);
 
+  // Decluttered nav — only public links + owner CTA
   const navLinks = [
     { href: "/properties", label: "Properties" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
-    ...(isAuthenticated ? [{ href: "/dashboard", label: "Dashboard" }] : []),
-    ...(isAuthenticated ? [{ href: "/saved", label: "Saved" }] : []),
-    ...(isAuthenticated ? [{ href: "/history", label: "History" }] : []),
-    ...(isOwner
-      ? [{ href: "/properties/manage", label: "My Properties" }]
-      : []),
   ];
 
   const handleSignOut = async () => {
@@ -162,17 +165,6 @@ export const Navbar = () => {
               <ThemeToggle />
               {isAuthenticated ? (
                 <>
-                  {!isOwner && (
-                    <Link href="/upgrade">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="rounded-full text-sm"
-                      >
-                        Become an Owner
-                      </Button>
-                    </Link>
-                  )}
                   {isOwner && (
                     <Link href="/properties/add">
                       <Button
@@ -215,24 +207,18 @@ export const Navbar = () => {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 8, scale: 0.96 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border bg-card shadow-lg"
+                          className="absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-xl border bg-card shadow-lg"
                           role="menu"
                         >
                           <div className="border-b px-4 py-3">
-                            <p className="text-sm font-medium">{userName || "User"}</p>
+                            <p className="text-sm font-medium">
+                              {userName || "User"}
+                            </p>
                             <p className="text-xs text-muted-foreground truncate">
                               {user?.email as string}
                             </p>
                           </div>
                           <div className="py-1">
-                            <Link
-                              href="/profile"
-                              className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                              role="menuitem"
-                            >
-                              <User className="h-4 w-4" />
-                              Profile
-                            </Link>
                             <Link
                               href="/dashboard"
                               className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
@@ -241,17 +227,43 @@ export const Navbar = () => {
                               <Home className="h-4 w-4" />
                               Dashboard
                             </Link>
-                            {isOwner && (
+                            <Link
+                              href="/saved"
+                              className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              role="menuitem"
+                            >
+                              <Heart className="h-4 w-4" />
+                              Saved Properties
+                            </Link>
+                            <Link
+                              href="/history"
+                              className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              role="menuitem"
+                            >
+                              <Clock className="h-4 w-4" />
+                              History
+                            </Link>
+                            <Link
+                              href="/profile"
+                              className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              role="menuitem"
+                            >
+                              <User className="h-4 w-4" />
+                              Profile
+                            </Link>
+                          </div>
+                          {isOwner && (
+                            <div className="border-t py-1">
                               <Link
                                 href="/properties/manage"
                                 className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                                 role="menuitem"
                               >
-                                <Settings className="h-4 w-4" />
+                                <BarChart3 className="h-4 w-4" />
                                 My Properties
                               </Link>
-                            )}
-                          </div>
+                            </div>
+                          )}
                           <div className="border-t py-1">
                             <button
                               onClick={handleSignOut}
@@ -361,6 +373,7 @@ export const Navbar = () => {
               className="fixed top-20 left-4 right-4 z-50 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-2xl border bg-background p-4 shadow-lg lg:hidden"
             >
               <nav className="flex flex-col gap-1">
+                {/* Public nav */}
                 {navLinks.map((link, i) => (
                   <motion.div
                     key={link.href}
@@ -381,20 +394,47 @@ export const Navbar = () => {
                     </Link>
                   </motion.div>
                 ))}
+
+                {/* Authenticated links — flat list */}
                 {isAuthenticated && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: navLinks.length * 0.03 }}
-                  >
-                    <Link
-                      href="/profile"
-                      className="block rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Profile
-                    </Link>
-                  </motion.div>
+                  <>
+                    <div className="my-2 h-px bg-border" />
+                    {[
+                      { href: "/dashboard", label: "Dashboard", icon: Home },
+                      { href: "/saved", label: "Saved Properties", icon: Heart },
+                      { href: "/history", label: "History", icon: Clock },
+                      { href: "/profile", label: "Profile", icon: User },
+                      ...(isOwner
+                        ? [
+                            {
+                              href: "/properties/manage",
+                              label: "My Properties",
+                              icon: BarChart3,
+                            },
+                          ]
+                        : []),
+                    ].map((link, i) => (
+                      <motion.div
+                        key={link.href}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: (navLinks.length + 1 + i) * 0.03 }}
+                      >
+                        <Link
+                          href={link.href}
+                          className={`flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
+                            isActive(link.href)
+                              ? "bg-primary/10 text-primary"
+                              : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                          }`}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <link.icon className="h-4 w-4" />
+                          {link.label}
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </>
                 )}
 
                 <div className="my-2 h-px bg-border" />

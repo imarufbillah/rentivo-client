@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { Mail, Phone, MapPin } from "lucide-react";
+import { useSession } from "@/hooks/useAuth";
 
 const socialLinks = [
   {
@@ -40,126 +43,140 @@ const socialLinks = [
   },
 ];
 
-const footerLinks = {
-  browse: [
-    { href: "/properties", label: "Properties" },
-    { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact" },
-  ],
-  account: [
-    { href: "/login", label: "Sign in" },
-    { href: "/register", label: "Sign up" },
-    { href: "/dashboard", label: "Dashboard" },
-  ],
-  legal: [
-    { href: "/privacy", label: "Privacy Policy" },
-    { href: "/terms", label: "Terms of Service" },
-  ],
-};
+const FooterContent = () => {
+  const { data: session } = useSession();
+  const user = session?.user as Record<string, unknown> | undefined;
+  const isAuthenticated = !!user;
 
-export const Footer = () => (
-  <footer className="border-t bg-muted/30">
-    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-2 gap-10 md:grid-cols-5">
-        {/* Brand */}
-        <div className="col-span-2 md:col-span-1">
-          <Link href="/" className="text-xl font-bold tracking-tight">
-            <span className="text-primary">Rentivo</span>
-          </Link>
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-            AI-powered property rental platform that matches you with your
-            perfect home.
-          </p>
-        </div>
+  const footerLinks = {
+    browse: [
+      { href: "/properties", label: "Properties" },
+      { href: "/about", label: "About" },
+      { href: "/contact", label: "Contact" },
+    ],
+    account: isAuthenticated
+      ? [
+          { href: "/dashboard", label: "Dashboard" },
+          { href: "/saved", label: "Saved Properties" },
+          { href: "/history", label: "History" },
+          { href: "/profile", label: "Profile" },
+        ]
+      : [
+          { href: "/login", label: "Sign in" },
+          { href: "/register", label: "Sign up" },
+        ],
+    legal: [
+      { href: "/privacy", label: "Privacy Policy" },
+      { href: "/terms", label: "Terms of Service" },
+    ],
+  };
 
-        {/* Browse */}
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Browse</h3>
-          <ul className="mt-4 space-y-3">
-            {footerLinks.browse.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
+  return (
+    <footer className="border-t bg-muted/30">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-5">
+          {/* Brand */}
+          <div className="col-span-2 md:col-span-1">
+            <Link href="/" className="text-xl font-bold tracking-tight">
+              <span className="text-primary">Rentivo</span>
+            </Link>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+              AI-powered property rental platform that matches you with your
+              perfect home.
+            </p>
+          </div>
+
+          {/* Browse */}
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">Browse</h3>
+            <ul className="mt-4 space-y-3">
+              {footerLinks.browse.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Account */}
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">Account</h3>
+            <ul className="mt-4 space-y-3">
+              {footerLinks.account.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">Legal</h3>
+            <ul className="mt-4 space-y-3">
+              {footerLinks.legal.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">Contact</h3>
+            <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+              <li className="flex items-center gap-2.5">
+                <Mail className="h-4 w-4 shrink-0 text-muted-foreground/60" />
+                support@rentivo.com
               </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Account */}
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Account</h3>
-          <ul className="mt-4 space-y-3">
-            {footerLinks.account.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
+              <li className="flex items-center gap-2.5">
+                <Phone className="h-4 w-4 shrink-0 text-muted-foreground/60" />
+                +1 (555) 123-4567
               </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Legal */}
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Legal</h3>
-          <ul className="mt-4 space-y-3">
-            {footerLinks.legal.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
+              <li className="flex items-start gap-2.5">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/60" />
+                123 Rental Street, New York, NY 10001
               </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Contact */}
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Contact</h3>
-          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-            <li className="flex items-center gap-2.5">
-              <Mail className="h-4 w-4 shrink-0 text-muted-foreground/60" />
-              support@rentivo.com
-            </li>
-            <li className="flex items-center gap-2.5">
-              <Phone className="h-4 w-4 shrink-0 text-muted-foreground/60" />
-              +1 (555) 123-4567
-            </li>
-            <li className="flex items-start gap-2.5">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/60" />
-              123 Rental Street, New York, NY 10001
-            </li>
-          </ul>
-          <div className="mt-5 flex gap-2">
-            {socialLinks.map((social) => (
-              <a
-                key={social.label}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary"
-                aria-label={social.label}
-              >
-                {social.icon}
-              </a>
-            ))}
+            </ul>
+            <div className="mt-5 flex gap-2">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary"
+                  aria-label={social.label}
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="mt-12 border-t pt-8 text-center text-sm text-muted-foreground">
-        &copy; {new Date().getFullYear()} Rentivo. All rights reserved.
+        <div className="mt-12 border-t pt-8 text-center text-sm text-muted-foreground">
+          &copy; {new Date().getFullYear()} Rentivo. All rights reserved.
+        </div>
       </div>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};
+
+export const Footer = () => <FooterContent />;
