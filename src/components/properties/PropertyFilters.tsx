@@ -349,7 +349,7 @@ export const PropertyFilters = ({
 
       {/* Amenities — collapsible */}
       {amenitiesList.length > 0 && (
-        <Accordion defaultValue={["amenities"]}>
+        <Accordion defaultValue={[]}>
           <AccordionItem value="amenities" className="border-none">
             <AccordionTrigger className="py-1 text-xs text-muted-foreground hover:no-underline">
               Amenities
