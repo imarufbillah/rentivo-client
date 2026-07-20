@@ -3,6 +3,7 @@ import { DM_Sans, Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { ChatWidgetWrapper } from "@/components/chat/ChatWidgetWrapper";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import "./globals.css";
@@ -45,6 +46,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Providers>
+          <ScrollToTop />
           <Navbar />
           <main className="flex-1 pt-20">
             <ErrorBoundary>{children}</ErrorBoundary>
