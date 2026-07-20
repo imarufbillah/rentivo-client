@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User, Settings, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { useSession } from "@/hooks/useAuth";
@@ -16,6 +16,7 @@ export const Navbar = () => {
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const user = session?.user as Record<string, unknown> | undefined;
   const isAuthenticated = !!user;
@@ -40,7 +41,49 @@ export const Navbar = () => {
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setProfileOpen(false);
   }, [pathname]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
+  // Escape key to close mobile menu and profile dropdown
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (mobileMenuOpen) setMobileMenuOpen(false);
+        if (profileOpen) setProfileOpen(false);
+      }
+    },
+    [mobileMenuOpen, profileOpen]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    if (!profileOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("[data-profile-menu]")) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [profileOpen]);
 
   const navLinks = [
     { href: "/properties", label: "Properties" },
@@ -59,13 +102,14 @@ export const Navbar = () => {
     window.location.href = "/";
   };
 
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(href + "/");
+
   return (
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "py-3"
-            : "py-4"
+          scrolled ? "py-3" : "py-4"
         }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -92,13 +136,13 @@ export const Navbar = () => {
                   key={link.href}
                   href={link.href}
                   className={`relative px-4 py-2 text-sm font-medium rounded-full transition-colors ${
-                    pathname === link.href
+                    isActive(link.href)
                       ? "text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`}
                 >
                   {link.label}
-                  {pathname === link.href && (
+                  {isActive(link.href) && (
                     <motion.div
                       layoutId="nav-indicator"
                       className="absolute inset-0 rounded-full bg-primary/10 -z-10"
@@ -129,41 +173,99 @@ export const Navbar = () => {
                       </Button>
                     </Link>
                   )}
-                  <Link href="/properties/add">
-                    <Button
-                      size="sm"
-                      className="rounded-full text-sm bg-primary text-primary-foreground hover:bg-primary/90"
+                  {isOwner && (
+                    <Link href="/properties/add">
+                      <Button
+                        size="sm"
+                        className="rounded-full text-sm bg-primary text-primary-foreground hover:bg-primary/90"
+                      >
+                        Add Property
+                      </Button>
+                    </Link>
+                  )}
+
+                  {/* Profile dropdown */}
+                  <div className="relative" data-profile-menu>
+                    <button
+                      onClick={() => setProfileOpen(!profileOpen)}
+                      className="flex items-center gap-2 rounded-full p-1 transition-colors hover:bg-muted/50"
+                      aria-label="Account menu"
+                      aria-expanded={profileOpen}
+                      aria-haspopup="true"
                     >
-                      Add Property
-                    </Button>
-                  </Link>
-                  <Link
-                    href="/profile"
-                    className="flex items-center gap-2 rounded-full p-1 transition-colors hover:bg-muted/50"
-                    aria-label="Go to profile"
-                  >
-                    {userImage ? (
-                      <Image
-                        src={userImage}
-                        alt={userName || "User"}
-                        width={32}
-                        height={32}
-                        className="h-8 w-8 rounded-full object-cover ring-2 ring-border"
-                      />
-                    ) : (
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary ring-2 ring-border">
-                        {initials}
-                      </div>
-                    )}
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleSignOut}
-                    className="rounded-full text-sm text-muted-foreground"
-                  >
-                    Sign out
-                  </Button>
+                      {userImage ? (
+                        <Image
+                          src={userImage}
+                          alt={userName || "User"}
+                          width={32}
+                          height={32}
+                          className="h-8 w-8 rounded-full object-cover ring-2 ring-border"
+                        />
+                      ) : (
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary ring-2 ring-border">
+                          {initials}
+                        </div>
+                      )}
+                    </button>
+
+                    <AnimatePresence>
+                      {profileOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border bg-card shadow-lg"
+                          role="menu"
+                        >
+                          <div className="border-b px-4 py-3">
+                            <p className="text-sm font-medium">{userName || "User"}</p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {user?.email as string}
+                            </p>
+                          </div>
+                          <div className="py-1">
+                            <Link
+                              href="/profile"
+                              className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              role="menuitem"
+                            >
+                              <User className="h-4 w-4" />
+                              Profile
+                            </Link>
+                            <Link
+                              href="/dashboard"
+                              className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              role="menuitem"
+                            >
+                              <Home className="h-4 w-4" />
+                              Dashboard
+                            </Link>
+                            {isOwner && (
+                              <Link
+                                href="/properties/manage"
+                                className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                role="menuitem"
+                              >
+                                <Settings className="h-4 w-4" />
+                                My Properties
+                              </Link>
+                            )}
+                          </div>
+                          <div className="border-t py-1">
+                            <button
+                              onClick={handleSignOut}
+                              className="flex w-full items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                              role="menuitem"
+                            >
+                              <LogOut className="h-4 w-4" />
+                              Sign out
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </>
               ) : (
                 <>
@@ -245,16 +347,20 @@ export const Navbar = () => {
               transition={{ duration: 0.2 }}
               className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden"
               onClick={() => setMobileMenuOpen(false)}
+              aria-hidden="true"
             />
             <motion.div
               id="mobile-menu"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Mobile navigation"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed top-20 left-4 right-4 z-50 rounded-2xl border bg-background p-4 shadow-lg lg:hidden"
+              className="fixed top-20 left-4 right-4 z-50 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-2xl border bg-background p-4 shadow-lg lg:hidden"
             >
-              <nav className="flex flex-col gap-1" aria-label="Mobile navigation">
+              <nav className="flex flex-col gap-1">
                 {navLinks.map((link, i) => (
                   <motion.div
                     key={link.href}
@@ -265,7 +371,7 @@ export const Navbar = () => {
                     <Link
                       href={link.href}
                       className={`block rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
-                        pathname === link.href
+                        isActive(link.href)
                           ? "bg-primary/10 text-primary"
                           : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                       }`}
@@ -306,11 +412,13 @@ export const Navbar = () => {
                         </Button>
                       </Link>
                     )}
-                    <Link href="/properties/add" onClick={() => setMobileMenuOpen(false)}>
-                      <Button size="sm" className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-                        Add Property
-                      </Button>
-                    </Link>
+                    {isOwner && (
+                      <Link href="/properties/add" onClick={() => setMobileMenuOpen(false)}>
+                        <Button size="sm" className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+                          Add Property
+                        </Button>
+                      </Link>
+                    )}
                     <Button
                       variant="ghost"
                       size="sm"

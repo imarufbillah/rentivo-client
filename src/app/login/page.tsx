@@ -1,19 +1,21 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "@/hooks/useAuth";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 const LoginPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const { data: session, isLoading } = useSession();
 
   useEffect(() => {
     if (!isLoading && session) {
-      router.replace("/dashboard");
+      router.replace(callbackUrl);
     }
-  }, [session, isLoading, router]);
+  }, [session, isLoading, router, callbackUrl]);
 
   if (isLoading) {
     return (

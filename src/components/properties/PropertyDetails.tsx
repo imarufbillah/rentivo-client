@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PropertyCard } from "./PropertyCard";
@@ -17,12 +18,13 @@ import { ReviewForm } from "@/components/reviews/ReviewForm";
 import {
   useTrackInteraction,
   useInteractionState,
+  useDeleteInteraction,
 } from "@/hooks/useInteractions";
 import { usePropertyRentalStatus } from "@/hooks/useRentals";
 import { useSession } from "@/hooks/useAuth";
 import { Property } from "@/types";
 import { PropertyOwner } from "@/hooks/useProperties";
-import { Heart } from "lucide-react";
+import { Heart, LogIn } from "lucide-react";
 
 interface PropertyDetailsProps {
   property: Property;
@@ -37,6 +39,7 @@ export const PropertyDetails = ({
 }: PropertyDetailsProps) => {
   const { data: session } = useSession();
   const trackInteraction = useTrackInteraction();
+  const deleteInteraction = useDeleteInteraction();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const propertyId = property._id?.toString() || "";
   const { data: interactionStateData } = useInteractionState(propertyId);
@@ -73,30 +76,73 @@ export const PropertyDetails = ({
     }
   }, [property._id, session]);
 
-  const handleSave = () => {
+  const handleSaveToggle = () => {
     if (!session || !property._id) return;
-    setIsSaving(true);
-    trackInteraction.mutate(
-      { propertyId: property._id.toString(), type: "save" },
-      {
-        onSuccess: () => {
-          setInteractionState("saved");
-          toast.success("Property saved to your favorites");
-        },
-        onError: () => {
-          toast.error("Failed to save property. Please try again.");
-        },
-        onSettled: () => {
-          setIsSaving(false);
-        },
-      }
-    );
+
+    if (interactionState === "saved") {
+      setIsSaving(true);
+      deleteInteraction.mutate(
+        { propertyId: property._id.toString(), type: "save" },
+        {
+          onSuccess: () => {
+            setInteractionState("idle");
+            toast.success("Property removed from saved");
+          },
+          onError: () => {
+            toast.error("Failed to remove property. Please try again.");
+          },
+          onSettled: () => {
+            setIsSaving(false);
+          },
+        }
+      );
+    } else {
+      setIsSaving(true);
+      trackInteraction.mutate(
+        { propertyId: property._id.toString(), type: "save" },
+        {
+          onSuccess: () => {
+            setInteractionState("saved");
+            toast.success("Property saved to your favorites");
+          },
+          onError: () => {
+            toast.error("Failed to save property. Please try again.");
+          },
+          onSettled: () => {
+            setIsSaving(false);
+          },
+        }
+      );
+    }
   };
 
   const images = property.images;
 
   return (
     <div className="mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-6 lg:px-8">
+      {/* Breadcrumb */}
+      <nav className="text-sm text-muted-foreground" aria-label="Breadcrumb">
+        <ol className="flex items-center gap-1.5">
+          <li>
+            <Link href="/" className="hover:text-foreground transition-colors">
+              Home
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link href="/properties" className="hover:text-foreground transition-colors">
+              Properties
+            </Link>
+          </li>
+          {property.location && (
+            <>
+              <li aria-hidden="true">/</li>
+              <li className="truncate max-w-[150px]">{property.location}</li>
+            </>
+          )}
+        </ol>
+      </nav>
+
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Left: Gallery + Description */}
         <div className="space-y-6 lg:col-span-2">
@@ -151,7 +197,7 @@ export const PropertyDetails = ({
         </div>
 
         {/* Right: Sidebar */}
-        <div className="space-y-5">
+        <div className="space-y-5 lg:sticky lg:top-24 lg:self-start">
           {/* Price */}
           <div className="rounded-2xl border bg-card p-5">
             <div className="text-3xl font-bold text-foreground">
@@ -162,14 +208,14 @@ export const PropertyDetails = ({
             </div>
           </div>
 
-          {/* Save + Rent buttons */}
+          {/* Save + Rent buttons — authenticated */}
           {session && (
             <div className="flex gap-3">
               <Button
-                onClick={handleSave}
+                onClick={handleSaveToggle}
                 variant="outline"
                 className="flex-1 rounded-full"
-                disabled={isSaving || interactionState === "saved"}
+                disabled={isSaving}
               >
                 <Heart
                   className={`mr-2 h-4 w-4 ${
@@ -181,6 +227,25 @@ export const PropertyDetails = ({
             </div>
           )}
 
+          {/* Guest CTAs */}
+          {!session && (
+            <div className="flex flex-col gap-2">
+              <Link href={`/login?callbackUrl=${encodeURIComponent(`/properties/${propertyId}`)}`}>
+                <Button variant="outline" className="w-full rounded-full">
+                  <Heart className="mr-2 h-4 w-4" />
+                  Sign in to save
+                </Button>
+              </Link>
+              <Link href={`/login?callbackUrl=${encodeURIComponent(`/properties/${propertyId}`)}`}>
+                <Button className="w-full rounded-full" size="lg">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign in to rent
+                </Button>
+              </Link>
+            </div>
+          )}
+
+          {/* Rent button — authenticated */}
           {session && (
             <RentButton property={property} isOwner={isOwner} />
           )}
