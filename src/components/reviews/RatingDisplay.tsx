@@ -46,7 +46,7 @@ export const RatingDisplay = ({
   });
 
   return (
-    <span className="inline-flex items-center gap-0.5 text-amber-400">
+    <span className="inline-flex items-center gap-0.5 text-warning">
       {stars.map((fill, i) => (
         <span key={i} className={sizeClasses[size]}>
           <StarIcon fill={fill} />
