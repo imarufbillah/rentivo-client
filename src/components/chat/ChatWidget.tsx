@@ -390,11 +390,20 @@ export const ChatWidget = () => {
               role="dialog"
               aria-label="Rentivo chat assistant"
               aria-modal="true"
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={0.2}
+              onDragEnd={(_e, info) => {
+                if (info.offset.y > 100) {
+                  setIsOpen(false);
+                  triggerRef.current?.focus();
+                }
+              }}
               initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: "100%" }}
               animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: "100%" }}
               transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed bottom-0 left-0 right-0 z-chat flex max-h-[80dvh] flex-col rounded-t-2xl border bg-background shadow-xl"
+              className="fixed bottom-14 left-0 right-0 z-chat flex max-h-[70dvh] flex-col rounded-t-2xl border bg-background shadow-xl"
               style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
             >
               {/* Drag handle */}
