@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChatMessage } from "./ChatMessage";
 import { ChatToolCallIndicator } from "./ChatToolCallIndicator";
 import { ChatFollowUpSuggestions } from "./ChatFollowUpSuggestions";
 import { useSession } from "@/hooks/useAuth";
 import { isLLMServiceError } from "@/lib/api/error";
 import { authClient } from "@/lib/auth-client";
-import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -22,6 +22,7 @@ const API_BASE_URL =
 
 export const ChatWidget = () => {
   const { data: session } = useSession();
+  const prefersReducedMotion = useReducedMotion();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -30,13 +31,63 @@ export const ChatWidget = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const chatPanelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   useEffect(() => {
-    if (isOpen) inputRef.current?.focus();
+    if (isOpen) {
+      // Delay focus to after animation
+      const timer = setTimeout(() => inputRef.current?.focus(), prefersReducedMotion ? 0 : 200);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, prefersReducedMotion]);
+
+  // Focus trap
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!isOpen || !chatPanelRef.current) return;
+      if (e.key === "Escape") {
+        setIsOpen(false);
+        triggerRef.current?.focus();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusable = chatPanelRef.current.querySelectorAll<HTMLElement>(
+        'input, button, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    },
+    [isOpen]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  // Lock body scroll on mobile when open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isOpen]);
 
   const sendMessage = async (text: string) => {
@@ -183,126 +234,279 @@ export const ChatWidget = () => {
 
   if (!session) return null;
 
+  const animationProps = prefersReducedMotion
+    ? {}
+    : {
+        initial: { opacity: 0, scale: 0.9, y: 20 },
+        animate: { opacity: 1, scale: 1, y: 0 },
+        exit: { opacity: 0, scale: 0.9, y: 20 },
+        transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] as const },
+      };
+
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="mb-3 flex w-[360px] flex-col overflow-hidden rounded-2xl border bg-card shadow-xl"
-          >
-            <div className="flex items-center justify-between border-b px-4 py-3">
-              <div>
-                <h3 className="font-display text-sm font-bold">
-                  Rentivo Assistant
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  Ask about properties
-                </p>
-              </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="rounded-full p-1.5 text-muted-foreground hover:bg-muted"
-                aria-label="Close chat"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div
-              className="flex-1 space-y-3 overflow-y-auto p-4"
-              style={{ maxHeight: "400px" }}
-              role="log"
-              aria-label="Chat messages"
-              aria-live="polite"
+    <>
+      {/* Desktop: floating panel */}
+      <div className="fixed bottom-4 right-4 z-chat hidden lg:block">
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              ref={chatPanelRef}
+              role="dialog"
+              aria-label="Rentivo chat assistant"
+              aria-modal="false"
+              {...animationProps}
+              className="mb-3 flex w-[360px] flex-col overflow-hidden rounded-2xl border bg-card shadow-xl"
             >
-              {messages.length === 0 && (
-                <div className="py-8 text-center text-sm text-muted-foreground">
-                  <p>Hi! How can I help you find a property?</p>
+              <div className="flex items-center justify-between border-b px-4 py-3">
+                <div>
+                  <h3 className="font-display text-sm font-bold">
+                    Rentivo Assistant
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Ask about properties
+                  </p>
                 </div>
-              )}
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    triggerRef.current?.focus();
+                  }}
+                  className="rounded-full p-1.5 text-muted-foreground hover:bg-muted"
+                  aria-label="Close chat"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
 
-              {messages.map((msg, i) => (
-                <ChatMessage
-                  key={i}
-                  role={msg.role}
-                  content={msg.content}
-                  timestamp={msg.timestamp}
-                  isStreaming={
-                    isStreaming &&
-                    i === messages.length - 1 &&
-                    msg.role === "assistant"
-                  }
-                />
-              ))}
-
-              {isStreaming &&
-                !activeTool &&
-                (messages.length === 0 ||
-                  messages[messages.length - 1]?.role === "user") && (
-                  <div className="flex justify-start" aria-label="Assistant is typing">
-                    <div className="max-w-[80%] rounded-2xl rounded-bl-md bg-muted px-4 py-2.5 text-sm">
-                      <span className="inline-flex gap-1">
-                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:0ms]" />
-                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:150ms]" />
-                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:300ms]" />
-                      </span>
-                    </div>
+              <div
+                className="flex-1 space-y-3 overflow-y-auto p-4"
+                style={{ maxHeight: "400px" }}
+                role="log"
+                aria-label="Chat messages"
+                aria-live="polite"
+              >
+                {messages.length === 0 && (
+                  <div className="py-8 text-center text-sm text-muted-foreground">
+                    <p>Hi! How can I help you find a property?</p>
                   </div>
                 )}
 
-              {activeTool && <ChatToolCallIndicator toolName={activeTool} />}
+                {messages.map((msg, i) => (
+                  <ChatMessage
+                    key={i}
+                    role={msg.role}
+                    content={msg.content}
+                    timestamp={msg.timestamp}
+                    isStreaming={
+                      isStreaming &&
+                      i === messages.length - 1 &&
+                      msg.role === "assistant"
+                    }
+                  />
+                ))}
 
-              <div ref={messagesEndRef} />
-            </div>
+                {isStreaming &&
+                  !activeTool &&
+                  (messages.length === 0 ||
+                    messages[messages.length - 1]?.role === "user") && (
+                    <div className="flex justify-start" aria-label="Assistant is typing">
+                      <div className="max-w-[80%] rounded-2xl rounded-bl-md bg-muted px-4 py-2.5 text-sm">
+                        <span className="inline-flex gap-1">
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:0ms]" />
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:150ms]" />
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:300ms]" />
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
-            {suggestions.length > 0 && !isStreaming && (
-              <ChatFollowUpSuggestions
-                suggestions={suggestions}
-                onSelect={(s) => sendMessage(s)}
-              />
-            )}
+                {activeTool && <ChatToolCallIndicator toolName={activeTool} />}
 
-            <form
-              onSubmit={handleSubmit}
-              className="flex gap-2 border-t p-3"
-            >
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type a message..."
-                aria-label="Type a message"
-                disabled={isStreaming}
-                className="flex-1 rounded-full border bg-background px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || isStreaming}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+                <div ref={messagesEndRef} />
+              </div>
+
+              {suggestions.length > 0 && !isStreaming && (
+                <ChatFollowUpSuggestions
+                  suggestions={suggestions}
+                  onSelect={(s) => sendMessage(s)}
+                />
+              )}
+
+              <form
+                onSubmit={handleSubmit}
+                className="flex gap-2 border-t p-3"
               >
-                <Send className="h-4 w-4" />
-              </button>
-            </form>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Type a message..."
+                  aria-label="Type a message"
+                  disabled={isStreaming}
+                  className="flex-1 rounded-full border bg-background px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isStreaming}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+                  aria-label="Send message"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-colors hover:bg-primary/90"
-        aria-label={isOpen ? "Close chat" : "Open chat"}
-      >
-        {isOpen ? (
-          <X className="h-5 w-5" />
-        ) : (
-          <MessageCircle className="h-5 w-5" />
+        <motion.button
+          ref={triggerRef}
+          whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+          whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-colors hover:bg-primary/90"
+          aria-label={isOpen ? "Close chat" : "Open chat"}
+          aria-expanded={isOpen}
+        >
+          {isOpen ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <MessageCircle className="h-5 w-5" />
+          )}
+        </motion.button>
+      </div>
+
+      {/* Mobile: full-screen overlay */}
+      <div className="lg:hidden">
+        {/* FAB */}
+        {!isOpen && (
+          <button
+            ref={triggerRef}
+            onClick={() => setIsOpen(true)}
+            className="fixed bottom-4 right-4 z-chat flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
+            aria-label="Open chat"
+          >
+            <MessageCircle className="h-5 w-5" />
+          </button>
         )}
-      </motion.button>
-    </div>
+
+        {/* Full-screen chat */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              ref={chatPanelRef}
+              role="dialog"
+              aria-label="Rentivo chat assistant"
+              aria-modal="true"
+              initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: "100%" }}
+              animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: "100%" }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="fixed inset-0 z-chat flex flex-col bg-background"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b px-4 py-3">
+                <div>
+                  <h3 className="font-display text-sm font-bold">
+                    Rentivo Assistant
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Ask about properties
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    triggerRef.current?.focus();
+                  }}
+                  className="rounded-full p-1.5 text-muted-foreground hover:bg-muted"
+                  aria-label="Close chat"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Messages */}
+              <div
+                className="flex-1 space-y-3 overflow-y-auto p-4"
+                role="log"
+                aria-label="Chat messages"
+                aria-live="polite"
+              >
+                {messages.length === 0 && (
+                  <div className="py-8 text-center text-sm text-muted-foreground">
+                    <p>Hi! How can I help you find a property?</p>
+                  </div>
+                )}
+
+                {messages.map((msg, i) => (
+                  <ChatMessage
+                    key={i}
+                    role={msg.role}
+                    content={msg.content}
+                    timestamp={msg.timestamp}
+                    isStreaming={
+                      isStreaming &&
+                      i === messages.length - 1 &&
+                      msg.role === "assistant"
+                    }
+                  />
+                ))}
+
+                {isStreaming &&
+                  !activeTool &&
+                  (messages.length === 0 ||
+                    messages[messages.length - 1]?.role === "user") && (
+                    <div className="flex justify-start" aria-label="Assistant is typing">
+                      <div className="max-w-[80%] rounded-2xl rounded-bl-md bg-muted px-4 py-2.5 text-sm">
+                        <span className="inline-flex gap-1">
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:0ms]" />
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:150ms]" />
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:300ms]" />
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                {activeTool && <ChatToolCallIndicator toolName={activeTool} />}
+
+                <div ref={messagesEndRef} />
+              </div>
+
+              {suggestions.length > 0 && !isStreaming && (
+                <ChatFollowUpSuggestions
+                  suggestions={suggestions}
+                  onSelect={(s) => sendMessage(s)}
+                />
+              )}
+
+              {/* Input */}
+              <form
+                onSubmit={handleSubmit}
+                className="flex gap-2 border-t p-3"
+                style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+              >
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Type a message..."
+                  aria-label="Type a message"
+                  disabled={isStreaming}
+                  className="flex-1 rounded-full border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isStreaming}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+                  aria-label="Send message"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
   );
 };
