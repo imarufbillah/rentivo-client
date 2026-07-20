@@ -5,6 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import { PropertyCard } from "./PropertyCard";
 import { BookingCard } from "./BookingCard";
 import { ListingMeta } from "./ListingMeta";
@@ -198,20 +203,34 @@ export const PropertyDetails = ({
             {/* Gallery nav arrows */}
             {images.length > 1 && (
               <>
-                <button
-                  onClick={goToPrev}
-                  aria-label="Previous image"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-background/80 text-foreground shadow-md backdrop-blur-sm transition-colors hover:bg-background"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={goToNext}
-                  aria-label="Next image"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-background/80 text-foreground shadow-md backdrop-blur-sm transition-colors hover:bg-background"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <button
+                        onClick={goToPrev}
+                        aria-label="Previous image"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-background/80 text-foreground shadow-md backdrop-blur-sm transition-colors hover:bg-background"
+                      />
+                    }
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </TooltipTrigger>
+                  <TooltipContent>Previous image</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <button
+                        onClick={goToNext}
+                        aria-label="Next image"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-background/80 text-foreground shadow-md backdrop-blur-sm transition-colors hover:bg-background"
+                      />
+                    }
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </TooltipTrigger>
+                  <TooltipContent>Next image</TooltipContent>
+                </Tooltip>
                 {/* Image counter */}
                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-background/80 px-3 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
                   {currentImageIndex + 1} / {images.length}

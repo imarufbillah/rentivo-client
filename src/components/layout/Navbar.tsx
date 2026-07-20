@@ -18,6 +18,11 @@ import {
   Key,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import { ThemeToggle } from "./ThemeToggle";
 import { useSession } from "@/hooks/useAuth";
 import { authClient } from "@/lib/auth-client";
@@ -162,7 +167,12 @@ export const Navbar = () => {
 
             {/* Desktop actions */}
             <div className="hidden lg:flex items-center gap-2">
-              <ThemeToggle />
+              <Tooltip>
+                <TooltipTrigger render={<div />}>
+                  <ThemeToggle />
+                </TooltipTrigger>
+                <TooltipContent>Toggle theme</TooltipContent>
+              </Tooltip>
               {isAuthenticated ? (
                 <>
                   {isOwner && (

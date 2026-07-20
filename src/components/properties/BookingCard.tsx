@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import { Heart, LogIn, Loader2, Key } from "lucide-react";
 import { Property } from "@/types";
 import { RentConfirmationDialog } from "@/components/properties/RentConfirmationDialog";
@@ -37,19 +42,28 @@ export const BookingCard = ({
       {/* Save + Rent buttons — authenticated */}
       {isAuthenticated && (
         <div className="mt-4 flex gap-3">
-          <Button
-            onClick={onSaveToggle}
-            variant="outline"
-            className="flex-1 rounded-full"
-            disabled={isSaving}
-          >
-            <Heart
-              className={`mr-2 h-4 w-4 ${
-                isSaved ? "fill-primary text-primary" : ""
-              }`}
-            />
-            {isSaved ? "Saved" : "Save"}
-          </Button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  onClick={onSaveToggle}
+                  variant="outline"
+                  className="flex-1 rounded-full"
+                  disabled={isSaving}
+                />
+              }
+            >
+              <Heart
+                className={`mr-2 h-4 w-4 ${
+                  isSaved ? "fill-primary text-primary" : ""
+                }`}
+              />
+              {isSaved ? "Saved" : "Save"}
+            </TooltipTrigger>
+            <TooltipContent>
+              {isSaved ? "Remove from saved" : "Save to favorites"}
+            </TooltipContent>
+          </Tooltip>
         </div>
       )}
 
