@@ -20,6 +20,9 @@ interface Message {
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
+const stripToolCalls = (text: string) =>
+  text.replace(/<tool_call>[\s\S]*?<\/tool_call>/g, "").trim();
+
 export const ChatWidget = () => {
   const { data: session } = useSession();
   const prefersReducedMotion = useReducedMotion();
@@ -145,18 +148,19 @@ export const ChatWidget = () => {
 
             if (parsed.type === "token") {
               assistantContent += parsed.content;
+              const displayContent = stripToolCalls(assistantContent);
               setMessages((prev) => {
                 const updated = [...prev];
                 const last = updated[updated.length - 1];
                 if (last?.role === "assistant") {
                   updated[updated.length - 1] = {
                     ...last,
-                    content: assistantContent,
+                    content: displayContent,
                   };
                 } else {
                   updated.push({
                     role: "assistant",
-                    content: assistantContent,
+                    content: displayContent,
                     timestamp: new Date(),
                   });
                 }
