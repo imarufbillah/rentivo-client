@@ -88,6 +88,7 @@ export const ChatWidget = () => {
   }, []);
 
   const sendMessage = async (text: string) => {
+    console.log("[CHAT-CLIENT] sendMessage called", { text, isStreaming });
     if (!text.trim() || isStreaming) return;
 
     const userMessage: Message = {
@@ -326,7 +327,11 @@ export const ChatWidget = () => {
               {suggestions.length > 0 && !isStreaming && (
                 <ChatFollowUpSuggestions
                   suggestions={suggestions}
-                  onSelect={(s) => sendMessage(s)}
+                  onSelect={(s) => {
+                    console.log("[CHAT-CLIENT] suggestion selected", { suggestion: s });
+                    setSuggestions([]);
+                    sendMessage(s);
+                  }}
                 />
               )}
 
@@ -487,7 +492,11 @@ export const ChatWidget = () => {
               {suggestions.length > 0 && !isStreaming && (
                 <ChatFollowUpSuggestions
                   suggestions={suggestions}
-                  onSelect={(s) => sendMessage(s)}
+                  onSelect={(s) => {
+                    console.log("[CHAT-CLIENT] suggestion selected", { suggestion: s });
+                    setSuggestions([]);
+                    sendMessage(s);
+                  }}
                 />
               )}
 

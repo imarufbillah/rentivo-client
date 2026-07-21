@@ -13,6 +13,7 @@ export const ChatFollowUpSuggestions = ({ suggestions, onSelect }: ChatFollowUpS
       {suggestions.map((suggestion, i) => (
         <button
           key={i}
+          type="button"
           onClick={() => onSelect(suggestion)}
           className="rounded-full border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
