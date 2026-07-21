@@ -12,7 +12,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { useUpgradeToOwner } from "@/hooks/useAuth";
 import { Home, Loader2, ArrowRight, Shield } from "lucide-react";
@@ -58,12 +57,14 @@ const UpgradePage = () => {
             )}
 
             <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
-                <Button size="lg" className="w-full rounded-full">
-                  <ArrowRight className="mr-2 h-4 w-4" />
-                  Become an Owner
-                </Button>
-              </DialogTrigger>
+              <Button
+                size="lg"
+                className="w-full rounded-full"
+                onClick={() => setOpen(true)}
+              >
+                <ArrowRight className="mr-2 h-4 w-4" />
+                Become an Owner
+              </Button>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
