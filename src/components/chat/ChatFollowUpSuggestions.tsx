@@ -5,11 +5,14 @@ interface ChatFollowUpSuggestionsProps {
   onSelect: (suggestion: string) => void;
 }
 
-export const ChatFollowUpSuggestions = ({ suggestions, onSelect }: ChatFollowUpSuggestionsProps) => {
+export const ChatFollowUpSuggestions = ({
+  suggestions,
+  onSelect,
+}: ChatFollowUpSuggestionsProps) => {
   if (suggestions.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-2 px-4">
+    <div className="flex flex-wrap gap-2 px-4 py-2">
       {suggestions.map((suggestion, i) => (
         <button
           key={i}

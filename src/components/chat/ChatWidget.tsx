@@ -17,8 +17,7 @@ interface Message {
   toolCalls?: string[];
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const stripToolCalls = (text: string) =>
   text.replace(/<tool_call>[\s\S]*?<\/tool_call>/g, "").trim();
@@ -44,7 +43,10 @@ export const ChatWidget = () => {
   useEffect(() => {
     if (isOpen) {
       // Delay focus to after animation
-      const timer = setTimeout(() => inputRef.current?.focus(), prefersReducedMotion ? 0 : 200);
+      const timer = setTimeout(
+        () => inputRef.current?.focus(),
+        prefersReducedMotion ? 0 : 200,
+      );
       return () => clearTimeout(timer);
     }
   }, [isOpen, prefersReducedMotion]);
@@ -60,7 +62,7 @@ export const ChatWidget = () => {
       }
       if (e.key !== "Tab") return;
       const focusable = chatPanelRef.current.querySelectorAll<HTMLElement>(
-        'input, button, [tabindex]:not([tabindex="-1"])'
+        'input, button, [tabindex]:not([tabindex="-1"])',
       );
       if (focusable.length === 0) return;
       const first = focusable[0];
@@ -73,7 +75,7 @@ export const ChatWidget = () => {
         first.focus();
       }
     },
-    [isOpen]
+    [isOpen],
   );
 
   useEffect(() => {
@@ -315,7 +317,10 @@ export const ChatWidget = () => {
                   !activeTool &&
                   (messages.length === 0 ||
                     messages[messages.length - 1]?.role === "user") && (
-                    <div className="flex justify-start" aria-label="Assistant is typing">
+                    <div
+                      className="flex justify-start"
+                      aria-label="Assistant is typing"
+                    >
                       <div className="max-w-[80%] rounded-2xl rounded-bl-md bg-muted px-4 py-2.5 text-sm">
                         <span className="inline-flex gap-1">
                           <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:0ms]" />
@@ -335,17 +340,16 @@ export const ChatWidget = () => {
                 <ChatFollowUpSuggestions
                   suggestions={suggestions}
                   onSelect={(s) => {
-                    console.log("[CHAT-CLIENT] suggestion selected", { suggestion: s });
+                    console.log("[CHAT-CLIENT] suggestion selected", {
+                      suggestion: s,
+                    });
                     setSuggestions([]);
                     sendMessage(s);
                   }}
                 />
               )}
 
-              <form
-                onSubmit={handleSubmit}
-                className="flex gap-2 border-t mt-2 p-3"
-              >
+              <form onSubmit={handleSubmit} className="flex gap-2 border-t p-3">
                 <input
                   ref={inputRef}
                   value={input}
@@ -415,10 +419,23 @@ export const ChatWidget = () => {
                   triggerRef.current?.focus();
                 }
               }}
-              initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: "100%" }}
-              animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-              exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: "100%" }}
-              transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
+              initial={
+                prefersReducedMotion
+                  ? { opacity: 1 }
+                  : { opacity: 0, y: "100%" }
+              }
+              animate={
+                prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }
+              }
+              exit={
+                prefersReducedMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: "100%" }
+              }
+              transition={{
+                duration: prefersReducedMotion ? 0 : 0.25,
+                ease: [0.22, 1, 0.36, 1],
+              }}
               className="fixed bottom-14 left-0 right-0 z-chat flex max-h-[70dvh] flex-col rounded-t-2xl border bg-background shadow-xl"
               style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
             >
@@ -480,7 +497,10 @@ export const ChatWidget = () => {
                   !activeTool &&
                   (messages.length === 0 ||
                     messages[messages.length - 1]?.role === "user") && (
-                    <div className="flex justify-start" aria-label="Assistant is typing">
+                    <div
+                      className="flex justify-start"
+                      aria-label="Assistant is typing"
+                    >
                       <div className="max-w-[80%] rounded-2xl rounded-bl-md bg-muted px-4 py-2.5 text-sm">
                         <span className="inline-flex gap-1">
                           <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:0ms]" />
@@ -500,7 +520,9 @@ export const ChatWidget = () => {
                 <ChatFollowUpSuggestions
                   suggestions={suggestions}
                   onSelect={(s) => {
-                    console.log("[CHAT-CLIENT] suggestion selected", { suggestion: s });
+                    console.log("[CHAT-CLIENT] suggestion selected", {
+                      suggestion: s,
+                    });
                     setSuggestions([]);
                     sendMessage(s);
                   }}
@@ -508,10 +530,7 @@ export const ChatWidget = () => {
               )}
 
               {/* Input */}
-              <form
-                onSubmit={handleSubmit}
-                className="flex gap-2 border-t p-3"
-              >
+              <form onSubmit={handleSubmit} className="flex gap-2 border-t p-3">
                 <input
                   ref={inputRef}
                   value={input}
