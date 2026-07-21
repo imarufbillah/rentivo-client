@@ -16,6 +16,7 @@ import {
   Settings,
   BarChart3,
   Key,
+  ArrowUpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -291,6 +292,18 @@ export const Navbar = () => {
                               >
                                 <BarChart3 className="h-4 w-4" />
                                 My Properties
+                              </Link>
+                            </div>
+                          )}
+                          {!isOwner && (
+                            <div className="border-t py-1">
+                              <Link
+                                href="/upgrade"
+                                className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                role="menuitem"
+                              >
+                                <ArrowUpCircle className="h-4 w-4" />
+                                Become an Owner
                               </Link>
                             </div>
                           )}
