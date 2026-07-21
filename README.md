@@ -12,7 +12,7 @@ Frontend for Rentivo — an AI-powered property rental platform. Built with Next
 | Auth | Better Auth client |
 | Animation | Framer Motion |
 | Charts | Recharts |
-| AI Chat | Groq SDK (client-side streaming) |
+| AI Chat | Server-side streaming (Gemini 2.5 Flash) |
 | Validation | Zod 4 |
 | Theming | next-themes (light/dark) |
 | Icons | Lucide React, React Icons |
@@ -113,9 +113,6 @@ Create `.env.local` in the project root:
 # API
 NEXT_PUBLIC_API_URL=http://localhost:3001
 
-# Groq (client-side AI chat)
-NEXT_PUBLIC_GROQ_API_KEY=gsk_...
-
 # imgbb (image uploads)
 NEXT_PUBLIC_IMGBB_API_KEY=your-imgbb-key
 ```
@@ -180,7 +177,6 @@ The dev server runs on `http://localhost:3000`.
 | Variable | Value |
 |----------|-------|
 | `NEXT_PUBLIC_API_URL` | `https://<your-render-url>` |
-| `NEXT_PUBLIC_GROQ_API_KEY` | Your Groq API key |
 | `NEXT_PUBLIC_IMGBB_API_KEY` | Your imgbb API key |
 
 ## License
