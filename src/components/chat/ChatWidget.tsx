@@ -115,10 +115,13 @@ export const ChatWidget = () => {
         credentials: "include",
         body: JSON.stringify({
           message: text,
-          conversationHistory: messages.slice(-10).map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
+          conversationHistory: messages
+            .filter((m) => m.content.trim())
+            .slice(-10)
+            .map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
         }),
       });
 
@@ -150,6 +153,7 @@ export const ChatWidget = () => {
             if (parsed.type === "token") {
               assistantContent += parsed.content;
               const displayContent = stripToolCalls(assistantContent);
+              if (!displayContent) return; // skip empty (tool-call-only chunks)
               setMessages((prev) => {
                 const updated = [...prev];
                 const last = updated[updated.length - 1];
@@ -210,10 +214,13 @@ export const ChatWidget = () => {
         headers,
         credentials: "include",
         body: JSON.stringify({
-          conversationHistory: messages.slice(-4).map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
+          conversationHistory: messages
+            .filter((m) => m.content.trim())
+            .slice(-4)
+            .map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
         }),
       });
 
