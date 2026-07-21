@@ -19,6 +19,7 @@ export interface User {
   role: UserRole;
   name?: string;
   avatar?: string;
+  image?: string;
   bio?: string;
   phone?: string;
   isVerified?: boolean;
