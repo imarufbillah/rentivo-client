@@ -4,8 +4,6 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "@/hooks/useAuth";
 import { LoginForm } from "@/components/auth/LoginForm";
-import { AppBreadcrumb } from "@/components/layout/AppBreadcrumb";
-
 const LoginPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,7 +28,6 @@ const LoginPage = () => {
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center px-4">
-      <AppBreadcrumb segments={[{ label: "Sign In" }]} />
       <LoginForm />
     </div>
   );
