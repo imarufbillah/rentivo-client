@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Heart, Clock, User, BarChart3, Compass } from "lucide-react";
-import { useSession } from "@/hooks/useAuth";
+import { useSession, useCurrentUser } from "@/hooks/useAuth";
 
 export const BottomNav = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const user = session?.user as Record<string, unknown> | undefined;
-  const isAuthenticated = !!user;
-  const isOwner = user?.role === "owner";
+  const { data: currentUser } = useCurrentUser();
+  const isAuthenticated = !!session;
+  const isOwner = currentUser?.role === "owner";
 
   if (!isAuthenticated) return null;
 

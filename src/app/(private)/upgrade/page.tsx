@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { RoleGuard } from "@/components/auth/RoleGuard";
@@ -13,13 +14,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useUpgradeToOwner } from "@/hooks/useAuth";
-import { Home, Loader2, ArrowRight, Shield } from "lucide-react";
+import { useUpgradeToOwner, useCurrentUser } from "@/hooks/useAuth";
+import { Home, Loader2, ArrowRight, Shield, CheckCircle } from "lucide-react";
 
 const UpgradePage = () => {
+  const router = useRouter();
   const upgradeMutation = useUpgradeToOwner();
+  const { data: user } = useCurrentUser();
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
+  const [upgraded, setUpgraded] = useState(false);
+
+  useEffect(() => {
+    if (upgraded && user?.role === "owner") {
+      const timer = setTimeout(() => {
+        router.push("/properties/manage");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [upgraded, user?.role, router]);
 
   const handleUpgrade = () => {
     setError("");
@@ -27,12 +40,34 @@ const UpgradePage = () => {
       onSuccess: () => {
         toast.success("Welcome! You are now an owner.");
         setOpen(false);
+        setUpgraded(true);
       },
       onError: (err) => {
         setError(err.message || "Upgrade failed. Please try again.");
       },
     });
   };
+
+  if (upgraded) {
+    return (
+      <ProtectedRoute>
+        <div className="flex min-h-dvh flex-col items-center justify-center px-4 text-center">
+          <div className="max-w-md space-y-6">
+            <div className="flex justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-500/10">
+                <CheckCircle className="h-8 w-8 text-green-500" />
+              </div>
+            </div>
+            <h1 className="text-2xl font-bold">Upgrade Successful!</h1>
+            <p className="text-muted-foreground">
+              You are now a property owner. Redirecting you to your properties...
+            </p>
+            <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" />
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
 
   return (
     <ProtectedRoute>

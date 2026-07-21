@@ -18,6 +18,18 @@ export const useSession = () => {
   });
 };
 
+export const useCurrentUser = () => {
+  return useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const result = await apiClient.get<{ user: User }>('/api/users/me');
+      return result.user;
+    },
+    staleTime: 1000 * 60 * 5,
+    retry: false,
+  });
+};
+
 export const useLogin = () => {
   const queryClient = useQueryClient();
 
@@ -65,7 +77,7 @@ export const useUpgradeToOwner = () => {
   return useMutation({
     mutationFn: () => apiClient.patch<{ user: User }>('/api/users/upgrade-to-owner'),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['session'] });
+      await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     },
   });
 };
@@ -86,6 +98,7 @@ export const useUpdateProfile = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     },
   });
 };

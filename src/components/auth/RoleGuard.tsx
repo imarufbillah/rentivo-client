@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "@/hooks/useAuth";
+import { useCurrentUser, useSession } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ShieldAlert, ArrowRight } from "lucide-react";
@@ -15,7 +15,9 @@ export const RoleGuard = ({
   allowedRole?: "owner" | "renter";
 }) => {
   const router = useRouter();
-  const { data: session, isLoading } = useSession();
+  const { data: session, isLoading: sessionLoading } = useSession();
+  const { data: user, isLoading: userLoading } = useCurrentUser();
+  const isLoading = sessionLoading || userLoading;
 
   useEffect(() => {
     if (!isLoading && !session) {
@@ -33,7 +35,6 @@ export const RoleGuard = ({
 
   if (!session) return null;
 
-  const user = session?.user as Record<string, unknown> | undefined;
   if (!user || user.role !== allowedRole) {
     const isOwnerRequired = allowedRole === "owner";
 

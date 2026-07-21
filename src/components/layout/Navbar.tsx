@@ -25,21 +25,22 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { ThemeToggle } from "./ThemeToggle";
-import { useSession } from "@/hooks/useAuth";
+import { useSession, useCurrentUser } from "@/hooks/useAuth";
 import { authClient } from "@/lib/auth-client";
 
 export const Navbar = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { data: currentUser } = useCurrentUser();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
-  const user = session?.user as Record<string, unknown> | undefined;
-  const isAuthenticated = !!user;
+  const user = currentUser;
+  const isAuthenticated = !!session;
   const isOwner = user?.role === "owner";
-  const userName = (user?.name as string) || "";
-  const userImage = user?.image as string | undefined;
+  const userName = user?.name || "";
+  const userImage = user?.avatar || user?.image;
 
   const initials = userName
     ? userName
