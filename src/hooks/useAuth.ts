@@ -65,9 +65,7 @@ export const useUpgradeToOwner = () => {
   return useMutation({
     mutationFn: () => apiClient.patch<{ user: User }>('/api/users/upgrade-to-owner'),
     onSuccess: async () => {
-      await authClient.signOut();
-      queryClient.clear();
-      window.location.href = '/login';
+      await queryClient.invalidateQueries({ queryKey: ['session'] });
     },
   });
 };

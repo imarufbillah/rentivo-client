@@ -5,18 +5,29 @@ import { toast } from "sonner";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useUpgradeToOwner } from "@/hooks/useAuth";
-import { Home, Loader2, ArrowRight } from "lucide-react";
+import { Home, Loader2, ArrowRight, Shield } from "lucide-react";
 
 const UpgradePage = () => {
   const upgradeMutation = useUpgradeToOwner();
   const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
 
   const handleUpgrade = () => {
     setError("");
     upgradeMutation.mutate(undefined, {
       onSuccess: () => {
-        toast.success("Welcome! You are now an owner. Please sign in again.");
+        toast.success("Welcome! You are now an owner.");
+        setOpen(false);
       },
       onError: (err) => {
         setError(err.message || "Upgrade failed. Please try again.");
@@ -46,23 +57,44 @@ const UpgradePage = () => {
               </div>
             )}
 
-            <Button
-              onClick={handleUpgrade}
-              disabled={upgradeMutation.isPending}
-              size="lg"
-              className="w-full rounded-full"
-            >
-              {upgradeMutation.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <ArrowRight className="mr-2 h-4 w-4" />
-              )}
-              {upgradeMutation.isPending ? "Upgrading..." : "Become an Owner"}
-            </Button>
-
-            <p className="text-xs text-muted-foreground">
-              You will be signed out and asked to log back in with your new owner account.
-            </p>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button size="lg" className="w-full rounded-full">
+                  <ArrowRight className="mr-2 h-4 w-4" />
+                  Become an Owner
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-primary" />
+                    Confirm Upgrade
+                  </DialogTitle>
+                  <DialogDescription>
+                    You will be upgraded to an Owner account. This lets you create, edit, and manage
+                    property listings. This action can be reversed later if needed.
+                  </DialogDescription>
+                </DialogHeader>
+                {error && (
+                  <div role="alert" className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                    {error}
+                  </div>
+                )}
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setOpen(false)}
+                    disabled={upgradeMutation.isPending}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleUpgrade} disabled={upgradeMutation.isPending}>
+                    {upgradeMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {upgradeMutation.isPending ? "Upgrading..." : "Confirm Upgrade"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </RoleGuard>
