@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, BedDouble, Bath, Star, ArrowRight } from "lucide-react";
+import { MapPin, BedDouble, Bath, Star } from "lucide-react";
 import { Property } from "@/types";
 
 interface ListingCardProps {
@@ -15,7 +15,10 @@ export const ListingCard = ({ property, badge, meta }: ListingCardProps) => {
   const propertyId = property._id?.toString() || "";
 
   return (
-    <div className="h-full flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+    <Link
+      href={`/properties/${propertyId}`}
+      className="group h-full flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+    >
       {/* Image */}
       <div className="relative aspect-[4/3] w-full overflow-hidden">
         {property.images?.[0] ? (
@@ -23,7 +26,7 @@ export const ListingCard = ({ property, badge, meta }: ListingCardProps) => {
             src={property.images[0]}
             alt={property.title}
             fill
-            className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           />
         ) : (
@@ -79,7 +82,7 @@ export const ListingCard = ({ property, badge, meta }: ListingCardProps) => {
         {meta && <div className="mt-2">{meta}</div>}
 
         {/* Stats */}
-        <div className="mt-3 flex items-center gap-4 border-t pt-3 text-xs text-muted-foreground">
+        <div className="mt-auto flex items-center gap-4 border-t pt-3 text-xs text-muted-foreground">
           {property.bedrooms != null && (
             <span className="flex items-center gap-1">
               <BedDouble className="h-3.5 w-3.5" />
@@ -98,18 +101,7 @@ export const ListingCard = ({ property, badge, meta }: ListingCardProps) => {
             </span>
           )}
         </div>
-
-        {/* View Details button */}
-        <div className="mt-auto pt-3">
-          <Link
-            href={`/properties/${propertyId}`}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
-          >
-            View Details
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
       </div>
-    </div>
+    </Link>
   );
 };
