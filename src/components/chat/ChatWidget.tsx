@@ -37,11 +37,11 @@ export const ChatWidget = () => {
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const scrollToBottom = useCallback(() => {
-    const panel = chatPanelRef.current;
-    if (!panel) return;
-    const scrollEl = panel.querySelector('[role="log"]');
-    if (scrollEl) {
-      scrollEl.scrollTop = scrollEl.scrollHeight;
+    const panels = document.querySelectorAll('[role="log"]');
+    for (const el of panels) {
+      if ((el as HTMLElement).offsetHeight > 0) {
+        el.scrollTop = el.scrollHeight;
+      }
     }
   }, []);
 
