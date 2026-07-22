@@ -32,15 +32,16 @@ export const ChatWidget = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const chatPanelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const scrollToBottom = useCallback(() => {
-    const el = scrollContainerRef.current;
-    if (el) {
-      el.scrollTop = el.scrollHeight;
+    const panel = chatPanelRef.current;
+    if (!panel) return;
+    const scrollEl = panel.querySelector('[role="log"]');
+    if (scrollEl) {
+      scrollEl.scrollTop = scrollEl.scrollHeight;
     }
   }, []);
 
@@ -301,7 +302,6 @@ export const ChatWidget = () => {
               </div>
 
               <div
-                ref={scrollContainerRef}
                 className="flex-1 space-y-3 overflow-y-auto p-4"
                 style={{ maxHeight: "400px" }}
                 role="log"
@@ -483,7 +483,6 @@ export const ChatWidget = () => {
 
               {/* Messages */}
               <div
-                ref={scrollContainerRef}
                 className="flex-1 space-y-3 overflow-y-auto p-4"
                 role="log"
                 aria-label="Chat messages"
