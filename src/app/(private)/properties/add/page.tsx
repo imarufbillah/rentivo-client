@@ -24,7 +24,7 @@ const AddPropertyPage = () => {
   return (
     <ProtectedRoute>
       <RoleGuard allowedRole="owner">
-        <div className="min-h-dvh mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="min-h-dvh mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <AppBreadcrumb segments={[{ label: "Properties", href: "/properties" }, { label: "Add Property" }]} />
           <div className="mb-8">
             <h1 className="font-display text-2xl font-bold">

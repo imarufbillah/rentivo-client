@@ -151,7 +151,7 @@ export const PropertyDetails = ({
   }, [goToPrev, goToNext]);
 
   return (
-    <div className="min-h-dvh mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-dvh mx-auto max-w-7xl space-y-10 px-4 py-8 sm:px-6 lg:px-8">
       <AppBreadcrumb
         segments={[
           { label: "Properties", href: "/properties" },

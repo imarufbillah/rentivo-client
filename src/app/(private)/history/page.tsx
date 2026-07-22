@@ -83,7 +83,7 @@ const HistoryPage = () => {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-dvh mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="min-h-dvh mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <AppBreadcrumb segments={[{ label: "History" }]} />
         <div className="mb-6">
           <h1 className="font-display text-2xl font-bold">History</h1>

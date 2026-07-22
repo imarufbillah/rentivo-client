@@ -37,7 +37,7 @@ const EditPropertyPage = () => {
     return (
       <ProtectedRoute>
         <RoleGuard allowedRole="owner">
-          <div className="min-h-dvh mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="min-h-dvh mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <div className="space-y-6">
               <div className="h-8 w-48 animate-pulse rounded-xl bg-muted" />
               <div className="h-4 w-64 animate-pulse rounded-xl bg-muted" />
@@ -60,7 +60,7 @@ const EditPropertyPage = () => {
     return (
       <ProtectedRoute>
         <RoleGuard allowedRole="owner">
-          <div className="min-h-dvh mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="min-h-dvh mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <div className="rounded-2xl border bg-card p-12 text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
                 <AlertTriangle className="h-8 w-8" />
