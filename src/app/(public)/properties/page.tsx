@@ -8,6 +8,7 @@ import {
   FilterState,
 } from "@/components/properties/PropertyFilters";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
@@ -16,7 +17,13 @@ import {
 } from "@/components/ui/tooltip";
 import { useProperties } from "@/hooks/useProperties";
 import { getErrorMessage } from "@/lib/api/error";
-import { AlertCircle, SlidersHorizontal, X } from "lucide-react";
+import {
+  AlertCircle,
+  SlidersHorizontal,
+  Search,
+  X,
+  ChevronDown,
+} from "lucide-react";
 
 const defaultFilters: FilterState = {
   search: "",
@@ -62,11 +69,11 @@ const filterChips = (filters: FilterState): FilterChip[] => {
   if (filters.propertyType) chips.push({ key: "propertyType", label: filters.propertyType });
   if (filters.minPrice || filters.maxPrice) {
     const min = filters.minPrice || "0";
-    const max = filters.maxPrice || "∞";
+    const max = filters.maxPrice || "\u221E";
     chips.push({ key: "price", label: `$${min} - $${max}` });
   }
   if (filters.minBedrooms) chips.push({ key: "minBedrooms", label: `${filters.minBedrooms}+ beds` });
-  if (filters.maxBedrooms) chips.push({ key: "maxBedrooms", label: `≤${filters.maxBedrooms} beds` });
+  if (filters.maxBedrooms) chips.push({ key: "maxBedrooms", label: `\u2264${filters.maxBedrooms} beds` });
   if (filters.minRating) chips.push({ key: "minRating", label: `${filters.minRating}+ stars` });
   if (filters.amenities) {
     filters.amenities.split(",").filter(Boolean).forEach((a) => {
@@ -80,7 +87,7 @@ const PropertiesPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [page, setPage] = useState(1);
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [filters, setFilters] = useState<FilterState>(() =>
     parseSearchParams(searchParams)
   );
@@ -153,6 +160,13 @@ const PropertiesPage = () => {
     [router]
   );
 
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      handleFilterChange({ ...filters, search: value });
+    },
+    [filters, handleFilterChange]
+  );
+
   const handleRemoveChip = useCallback(
     (chip: { key: string; label: string; amenityKey?: string }) => {
       const newFilters = { ...filters };
@@ -186,6 +200,7 @@ const PropertiesPage = () => {
 
   return (
     <div className="min-h-dvh mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Page heading */}
       <div className="mb-6">
         <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
           Find Your Perfect Property
@@ -197,157 +212,189 @@ const PropertiesPage = () => {
         )}
       </div>
 
-      {/* Mobile filter toggle + active chips */}
-      <div className="mb-4 flex flex-wrap items-center gap-2 lg:hidden">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-          className="rounded-full"
-        >
-          <SlidersHorizontal className="mr-2 h-4 w-4" />
-          Filters
+      {/* Sticky filter bar */}
+      <div className="sticky top-20 z-40 -mx-4 mb-6 bg-background/80 px-4 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border bg-card p-3 shadow-sm">
+          {/* Search input */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={filters.search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              placeholder="Search properties..."
+              aria-label="Search properties"
+              className="rounded-xl pl-9"
+            />
+          </div>
+
+          {/* Active chips */}
           {chips.length > 0 && (
-            <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
-              {chips.length}
-            </Badge>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {chips.map((chip) => (
+                <Badge
+                  key={chip.key + (chip.amenityKey || "")}
+                  variant="secondary"
+                  className="gap-1 rounded-full pr-1"
+                >
+                  {chip.label}
+                  <button
+                    onClick={() => handleRemoveChip(chip)}
+                    className="ml-0.5 rounded-full p-0.5 hover:bg-muted"
+                    aria-label={`Remove ${chip.label} filter`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
           )}
-        </Button>
+
+          {/* Clear all */}
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearAll}
+              className="h-8 rounded-full text-xs text-muted-foreground hover:text-foreground"
+            >
+              Clear all
+            </Button>
+          )}
+
+          {/* Filters toggle */}
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  onClick={() => setFiltersExpanded(!filtersExpanded)}
+                  className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                    filtersExpanded || hasActiveFilters
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-input text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
+                  aria-expanded={filtersExpanded}
+                  aria-label="Toggle filters"
+                />
+              }
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Filters
+              {hasActiveFilters && (
+                <Badge variant="secondary" className="ml-0.5 h-5 min-w-5 rounded-full p-0 text-[10px]">
+                  {chips.length + (filters.search ? 1 : 0)}
+                </Badge>
+              )}
+              <ChevronDown
+                className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                  filtersExpanded ? "rotate-180" : ""
+                }`}
+              />
+            </TooltipTrigger>
+            <TooltipContent>{filtersExpanded ? "Hide filters" : "Show filters"}</TooltipContent>
+          </Tooltip>
+        </div>
+
+        {/* Expanded filter panel */}
+        <div
+          className={`grid transition-all duration-200 ease-out ${
+            filtersExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="pt-3">
+              <PropertyFilters
+                onFilterChange={handleFilterChange}
+                initialFilters={filters}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Desktop active filter chips */}
-      {hasActiveFilters && (
-        <div className="mb-4 hidden flex-wrap items-center gap-2 lg:flex">
-          {chips.map((chip) => (
-            <Badge
-              key={chip.key + (chip.amenityKey || "")}
-              variant="secondary"
-              className="gap-1 rounded-full pr-1"
-            >
-              {chip.label}
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <button
-                      onClick={() => handleRemoveChip(chip)}
-                      className="ml-1 rounded-full p-0.5 hover:bg-muted"
-                      aria-label={`Remove ${chip.label} filter`}
-                    />
-                  }
-                >
-                  <X className="h-3 w-3" />
-                </TooltipTrigger>
-                <TooltipContent>Remove filter</TooltipContent>
-              </Tooltip>
-            </Badge>
-          ))}
+      {/* Property grid */}
+      {error ? (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/5 py-12 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+            <AlertCircle className="h-8 w-8" />
+          </div>
+          <h3 className="mt-4 font-display text-lg font-bold">
+            Failed to Load Properties
+          </h3>
+          <p className="mt-1 max-w-md text-sm text-muted-foreground">
+            {getErrorMessage(error)}
+          </p>
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClearAll}
-            className="h-7 rounded-full text-xs text-muted-foreground"
+            onClick={() => refetch()}
+            variant="outline"
+            className="mt-4 rounded-full"
           >
-            Clear all
+            Try Again
           </Button>
         </div>
+      ) : (
+        <PropertyGrid properties={properties} isLoading={isLoading} />
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-        {/* Sidebar — desktop always, mobile conditional */}
-        <aside className={`${mobileFiltersOpen ? "block" : "hidden"} lg:block lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto scrollbar-hidden`}>
-          <PropertyFilters
-            onFilterChange={handleFilterChange}
-            initialFilters={filters}
-          />
-        </aside>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-8 flex items-center justify-center gap-2">
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  onClick={() => handlePageChange(Math.max(1, page - 1))}
+                  disabled={page <= 1}
+                  className="rounded-xl border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                />
+              }
+            >
+              Previous
+            </TooltipTrigger>
+            <TooltipContent>Previous page</TooltipContent>
+          </Tooltip>
 
-        {/* Content */}
-        <section>
-          {error ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/5 py-12 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
-                <AlertCircle className="h-8 w-8" />
-              </div>
-              <h3 className="mt-4 font-display text-lg font-bold">
-                Failed to Load Properties
-              </h3>
-              <p className="mt-1 max-w-md text-sm text-muted-foreground">
-                {getErrorMessage(error)}
-              </p>
-              <Button
-                onClick={() => refetch()}
-                variant="outline"
-                className="mt-4 rounded-full"
+          {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+            let pageNum: number;
+            if (totalPages <= 7) {
+              pageNum = i + 1;
+            } else if (page <= 4) {
+              pageNum = i + 1;
+            } else if (page >= totalPages - 3) {
+              pageNum = totalPages - 6 + i;
+            } else {
+              pageNum = page - 3 + i;
+            }
+            return (
+              <button
+                key={pageNum}
+                onClick={() => handlePageChange(pageNum)}
+                className={`h-10 w-10 rounded-xl text-sm font-medium transition-colors ${
+                  page === pageNum
+                    ? "bg-primary text-primary-foreground"
+                    : "border text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
               >
-                Try Again
-              </Button>
-            </div>
-          ) : (
-            <PropertyGrid properties={properties} isLoading={isLoading} />
-          )}
+                {pageNum}
+              </button>
+            );
+          })}
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="mt-8 flex items-center justify-center gap-2">
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <button
-                      onClick={() => handlePageChange(Math.max(1, page - 1))}
-                      disabled={page <= 1}
-                      className="rounded-xl border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-                    />
-                  }
-                >
-                  Previous
-                </TooltipTrigger>
-                <TooltipContent>Previous page</TooltipContent>
-              </Tooltip>
-
-              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-                let pageNum: number;
-                if (totalPages <= 7) {
-                  pageNum = i + 1;
-                } else if (page <= 4) {
-                  pageNum = i + 1;
-                } else if (page >= totalPages - 3) {
-                  pageNum = totalPages - 6 + i;
-                } else {
-                  pageNum = page - 3 + i;
-                }
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => handlePageChange(pageNum)}
-                    className={`h-10 w-10 rounded-xl text-sm font-medium transition-colors ${
-                      page === pageNum
-                        ? "bg-primary text-primary-foreground"
-                        : "border text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <button
-                      onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
-                      disabled={page >= totalPages}
-                      className="rounded-xl border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-                    />
-                  }
-                >
-                  Next
-                </TooltipTrigger>
-                <TooltipContent>Next page</TooltipContent>
-              </Tooltip>
-            </div>
-          )}
-        </section>
-      </div>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
+                  disabled={page >= totalPages}
+                  className="rounded-xl border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                />
+              }
+            >
+              Next
+            </TooltipTrigger>
+            <TooltipContent>Next page</TooltipContent>
+          </Tooltip>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,12 +17,6 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
-import { Search, SlidersHorizontal, X } from "lucide-react";
 
 interface PropertyFiltersProps {
   onFilterChange: (filters: FilterState) => void;
@@ -151,75 +144,8 @@ export const PropertyFilters = ({
     });
   };
 
-  const clearFilters = () => {
-    const empty: FilterState = {
-      search: "",
-      location: "",
-      minPrice: "",
-      maxPrice: "",
-      propertyType: "",
-      minBedrooms: "",
-      maxBedrooms: "",
-      minBathrooms: "",
-      maxBathrooms: "",
-      amenities: "",
-      minRating: "",
-      sortBy: "createdAt",
-      sortOrder: "desc",
-    };
-    setFilters(empty);
-    onFilterChange(empty);
-  };
-
-  const hasActiveFilters =
-    filters.search ||
-    filters.location ||
-    filters.minPrice ||
-    filters.maxPrice ||
-    filters.propertyType ||
-    filters.minBedrooms ||
-    filters.maxBedrooms ||
-    filters.minBathrooms ||
-    filters.maxBathrooms ||
-    filters.amenities ||
-    filters.minRating;
-
   return (
     <div className="space-y-5 rounded-2xl border bg-card p-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-          <h3 className="font-display text-sm font-bold">Filters</h3>
-        </div>
-        {hasActiveFilters && (
-          <Tooltip>
-            <TooltipTrigger render={<Button
-              variant="ghost"
-              size="sm"
-              onClick={clearFilters}
-              className="h-8 rounded-full text-xs text-muted-foreground hover:text-foreground"
-            />}>
-              <X className="mr-1 h-3 w-3" />
-              Clear all
-            </TooltipTrigger>
-            <TooltipContent>Remove all active filters</TooltipContent>
-          </Tooltip>
-        )}
-      </div>
-
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={filters.search}
-          onChange={(e) => updateFilter("search", e.target.value)}
-          placeholder="Search properties..."
-          aria-label="Search properties"
-          className="rounded-xl pl-9"
-        />
-      </div>
-
       {/* Location + Type */}
       <div className="space-y-3">
         <div>
