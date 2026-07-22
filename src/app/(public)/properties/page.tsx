@@ -213,7 +213,7 @@ const PropertiesPage = () => {
       </div>
 
       {/* Sticky filter bar */}
-      <div className="sticky top-20 z-40 -mx-4 mb-6 bg-background/80 px-4 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+      <div className="sticky top-20 z-40 -mx-4 mb-6 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
         <div className="flex flex-wrap items-center gap-3 rounded-2xl border bg-card p-3 shadow-sm">
           {/* Search input */}
           <div className="relative flex-1">
