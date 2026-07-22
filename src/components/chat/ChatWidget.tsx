@@ -41,6 +41,12 @@ export const ChatWidget = () => {
   }, [messages]);
 
   useEffect(() => {
+    if (!isStreaming) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [isStreaming]);
+
+  useEffect(() => {
     if (isOpen) {
       // Delay focus to after animation
       const timer = setTimeout(
