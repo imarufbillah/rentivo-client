@@ -1,39 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { RecommendationCard } from "./RecommendationCard";
-import {
-  PropertyFilters,
-  FilterState,
-} from "@/components/properties/PropertyFilters";
 import { Button } from "@/components/ui/button";
 import { useRecommendations } from "@/hooks/useRecommendations";
 import { getErrorMessage, isLLMServiceError } from "@/lib/api/error";
 import { AlertTriangle, SearchX } from "lucide-react";
 
 export const RecommendationFeed = () => {
-  const [filters, setFilters] = useState<FilterState>({
-    search: "",
-    location: "",
-    minPrice: "",
-    maxPrice: "",
-    propertyType: "",
-    minBedrooms: "",
-    maxBedrooms: "",
-    minBathrooms: "",
-    maxBathrooms: "",
-    amenities: "",
-    minRating: "",
-    sortBy: "createdAt",
-    sortOrder: "desc",
-  });
-
-  const { data, isLoading, error, refetch } = useRecommendations({
-    location: filters.location || undefined,
-    minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
-    maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
-    propertyType: filters.propertyType || undefined,
-  });
+  const { data, isLoading, error, refetch } = useRecommendations();
 
   const recommendations = data?.recommendations || [];
   const isPersonalized = data?.isPersonalized ?? true;
@@ -50,8 +24,6 @@ export const RecommendationFeed = () => {
             : "Discover properties popular with other renters"}
         </p>
       </div>
-
-      <PropertyFilters onFilterChange={setFilters} />
 
       {isLoading ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -102,7 +74,7 @@ export const RecommendationFeed = () => {
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
             {isPersonalized
-              ? "Try adjusting your filters to find more properties"
+              ? "Browse properties to get personalized recommendations"
               : "Browse properties to get personalized recommendations"}
           </p>
         </div>
